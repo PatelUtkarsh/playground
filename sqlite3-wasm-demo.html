@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sqlite 3 WASM demo</title>
+    <script src="https://cdn.jsdelivr.net/npm/@sqlite.org/sqlite-wasm@3.46.1-build4/sqlite-wasm/jswasm/sqlite3.mjs" type="module"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            max-width: 710px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            background-color: #FAF8FF;
+            color: #1A1B20;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #E1E2EC;
+            background-color: #FFFFFF;
+            color: #1A1B20;
+            font-family: 'Roboto Mono', monospace;
+        }
+        button {
+            background-color: #465D91;
+            border: none;
+            color: #FFFFFF;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+            background-color: #FFFFFF;
+        }
+        th, td {
+            border: 1px solid #E1E2EC;
+            padding: 8px;
+            text-align: left;
+            color: #1A1B20;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+        th {
+            background-color: #465D91;
+            color: #FFFFFF;
+        }
+        tr:nth-child(even) {
+            background-color: #F4F3FA;
+        }
+        #loading {
+            display: none;
+            color: #465D91;
+            font-weight: bold;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sqlite 3 wasm demo</h1>
+    <div id="loading">Loading SQLite and initializing database...</div>
+    <textarea id="query" placeholder="Enter your SQL query here...">SELECT * FROM person;</textarea>
+    <button id="executeButton" onclick="executeQuery()" disabled>Execute Query</button>
+    <div id="result"></div>
+
+    <script type="module">
+        import sqlite3InitModule from 'https://cdn.jsdelivr.net/npm/@sqlite.org/sqlite-wasm@3.46.1-build4/sqlite-wasm/jswasm/sqlite3.mjs';
+
+        const loadingElement = document.getElementById('loading');
+        const executeButton = document.getElementById('executeButton');
+
+        const initializeSQLite = async () => {
+            loadingElement.style.display = 'block';
+            try {
+                const sqlite3 = await sqlite3InitModule({
+                    print: console.log,
+                    printErr: console.error,
+                });
+                console.log('Running SQLite version', sqlite3.version.libVersion);
+                window.db = new sqlite3.oo1.DB();
+
+                window.db.exec(`
+                   -- Create the person table
+                    CREATE TABLE person (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        first_name TEXT NOT NULL,
+                        last_name TEXT NOT NULL,
+                        age INTEGER,
+                        email TEXT UNIQUE,
+                        city TEXT
+                    );
+                      INSERT INTO person (first_name, last_name, age, email, city) VALUES
+                        ('John', 'Doe', 28, 'john.doe@example.com', 'New York'),
+                        ('Jane', 'Smith', 34, 'jane.smith@example.com', 'Los Angeles'),
+                        ('Michael', 'Johnson', 45, 'michael.johnson@example.com', 'Chicago'),
+                        ('Emily', 'Davis', 22, 'emily.davis@example.com', 'Houston'),
+                        ('David', 'Wilson', 30, 'david.wilson@example.com', 'Phoenix'),
+                       ('Sophia', 'Martinez', 27, 'sophia.martinez@example.com', 'Philadelphia'),
+                       ('James', 'Brown', 50, 'james.brown@example.com', 'San Antonio'),
+                       ('Olivia', 'Jones', 19, 'olivia.jones@example.com', 'San Diego'),
+                       ('William', 'Garcia', 40, 'william.garcia@example.com', 'Dallas'),
+                       ('Isabella', 'Miller', 33, 'isabella.miller@example.com', 'San Jose');`);
+                console.log('Database initialized with sample data');
+                executeButton.disabled = false;
+            } catch (err) {
+                console.error('Initialization error:', err.message);
+                document.getElementById('result').innerHTML = `<p>Error initializing database: ${err.message}</p>`;
+            } finally {
+                loadingElement.style.display = 'none';
+            }
+        };
+
+        initializeSQLite();
+
+        window.executeQuery = () => {
+            const query = document.getElementById('query').value;
+            try {
+                const results = window.db.selectObjects(query);
+                displayResults(results);
+            } catch (err) {
+                document.getElementById('result').innerHTML = `<p>Error: ${err.message}</p>`;
+            }
+        };
+
+        function displayResults(results) {
+            if (results.length === 0) {
+                document.getElementById('result').innerHTML = '<p>No results.</p>';
+                return;
+            }
+            let columns = Object.keys(results[0]);
+            let tableHtml = '<table><tr>';
+            columns.forEach(column => {
+                tableHtml += `<th>${column}</th>`;
+            });
+            tableHtml += '</tr>';
+
+            results.forEach(row => {
+                tableHtml += '<tr>';
+
+                columns.forEach(column => {
+                    tableHtml += `<td>${row[column]}</td>`;
+                });
+                tableHtml += '</tr>';
+            });
+            tableHtml += '</table>';
+
+            document.getElementById('result').innerHTML = tableHtml;
+        }
+    </script>
+</body>
+</html>
