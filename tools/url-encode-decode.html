@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Encode/Decode</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #FAF8FF; /* background */
+            color: #1A1B20; /* onBackground */
+            margin: 20px;
+        }
+        .container {
+            max-width: 710px;
+            margin: 0 auto;
+            background-color: #FFFFFF; /* surfaceContainerLowest */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* shadow */
+        }
+        textarea {
+            width: calc(100% - 20px);
+            height: 100px;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #E1E2EC; /* surfaceVariant */
+            border-radius: 4px;
+            background-color: #FAF8FF; /* surface */
+            color: #1A1B20; /* onSurface */
+            resize: none;
+            font-family: 'Roboto', sans-serif;
+        }
+        button {
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            color: #FFFFFF; /* onPrimary */
+            font-family: 'Roboto', sans-serif;
+            font-weight: 500;
+        }
+        .encode-btn {
+            background-color: #465D91; /* primary */
+        }
+        .decode-btn {
+            background-color: #575E71; /* secondary */
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>URL Encode/Decode</h1>
+        <textarea id="inputText" placeholder="Enter text here..."></textarea>
+        <br>
+        <button class="encode-btn" onclick="encodeText()">Encode</button>
+        <button class="decode-btn" onclick="decodeText()">Decode</button>
+        <br>
+        <textarea id="outputText" placeholder="Result will appear here..."></textarea>
+    </div>
+
+    <script>
+        function encodeText() {
+            const input = document.getElementById('inputText').value;
+            const encoded = encodeURIComponent(input);
+            document.getElementById('outputText').value = encoded;
+        }
+
+        function decodeText() {
+            const input = document.getElementById('outputText').value;
+            const decoded = decodeURIComponent(input);
+            document.getElementById('inputText').value = decoded;
+        }
+    </script>
+</body>
+</html>
