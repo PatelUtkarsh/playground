@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat with Llama 3</title>
+
+  <!-- Import Material Theme and Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #FAF8FF;
+      color: #1A1B20;
+      font-family: 'Roboto', sans-serif;
+      padding: 1em;
+    }
+
+    h2 {
+      color: #465D91;
+    }
+
+    input, button, select {
+      font-family: 'Roboto Mono', monospace;
+      padding: 0.5em;
+      margin: 0.5em 0;
+      border: 1px solid #757780;
+      border-radius: 5px;
+    }
+
+    button {
+      background-color: #465D91;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      background-color: #C5C6D0;
+      cursor: not-allowed;
+    }
+
+    #output_cmpl {
+      border: 1px solid #aaa;
+      border-radius: 5px;
+      padding: 0.7em;
+      margin-top: 1em;
+    }
+
+    #input_prompt {
+      font-size: 1.1em;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Chat with Llama 3</h2>
+  <label for="model_select">Select Model:</label>
+  <select id="model_select">
+    <option value="" disabled selected>Select a model</option>
+    <option value="https://huggingface.co/ggml-org/models/resolve/main/tinyllamas/stories260K.gguf">TinyLlama Stories (260K)</option>
+    <option value="https://huggingface.co/ggml-org/models/resolve/main/bert-bge-small/ggml-model-f16.gguf">BERT Small</option>
+    <option value="https://huggingface.co/TinyLlama/TinyLlama-1.1B-Chat-v0.6/resolve/main/ggml-model-q4_0.gguf">TinyLlama 1.1B Chat</option>
+  </select><br/>
+  <button id="btn_start_cmpl" disabled>Load Model</button> Model: <span id="cmpl_model"></span><br/>
+  Prompt: <input id="input_prompt" value="Once upon a time," disabled/><br/>
+  Number of tokens: <input id="input_n_predict" value="50" type="number" disabled/><br/>
+  <button id="btn_run_cmpl" disabled>Run Completion</button>
+  <br/>
+  <div id="output_cmpl"></div>
+
+  <script type="module">
+    import { Wllama } from 'https://cdn.jsdelivr.net/npm/@wllama/wllama/esm/index.js';
+
+    const CONFIG_PATHS = {
+      'single-thread/wllama.js'       : 'https://cdn.jsdelivr.net/npm/@wllama/wllama/esm/single-thread/wllama.js',
+      'single-thread/wllama.wasm'     : 'https://cdn.jsdelivr.net/npm/@wllama/wllama/esm/single-thread/wllama.wasm',
+      'multi-thread/wllama.js'        : 'https://cdn.jsdelivr.net/npm/@wllama/wllama/esm/multi-thread/wllama.js',
+      'multi-thread/wllama.wasm'      : 'https://cdn.jsdelivr.net/npm/@wllama/wllama/esm/multi-thread/wllama.wasm',
+      'multi-thread/wllama.worker.mjs': 'https://cdn.jsdelivr.net/npm/@wllama/wllama/esm/multi-thread/wllama.worker.mjs',
+    };
+
+    async function main() {
+      const elemModelSelect = document.getElementById('model_select');
+      const elemCmplModel = document.getElementById('cmpl_model');
+      const elemBtnStartCmpl = document.getElementById('btn_start_cmpl');
+      const elemInput = document.getElementById('input_prompt');
+      const elemNPredict = document.getElementById('input_n_predict');
+      const elemBtnCompletions = document.getElementById('btn_run_cmpl');
+      const elemOutputCmpl = document.getElementById('output_cmpl');
+
+      elemModelSelect.onchange = () => {
+        elemBtnStartCmpl.disabled = false;
+        elemCmplModel.textContent = elemModelSelect.options[elemModelSelect.selectedIndex].text;
+      };
+
+      elemBtnStartCmpl.onclick = async () => {
+        elemBtnStartCmpl.disabled = true;
+        const modelUrl = elemModelSelect.value;
+        const wllama = new Wllama(CONFIG_PATHS);
+        await wllama.loadModelFromUrl(modelUrl);
+        elemInput.disabled = false;
+        elemNPredict.disabled = false;
+        elemBtnCompletions.disabled = false;
+
+        elemBtnCompletions.onclick = async () => {
+          elemBtnCompletions.disabled = true;
+          const outputText = await wllama.createCompletion(elemInput.value, {
+            nPredict: parseInt(elemNPredict.value),
+            sampling: {
+              temp: 0.5,
+              top_k: 40,
+              top_p: 0.9,
+            },
+          });
+          elemOutputCmpl.textContent = outputText;
+          elemBtnCompletions.disabled = false;
+        };
+      };
+    }
+
+    main();
+  </script>
+</body>
+</html>
