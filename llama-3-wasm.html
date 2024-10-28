@@ -13,18 +13,37 @@
       color: #1A1B20;
       font-family: 'Roboto', sans-serif;
       padding: 1em;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      width: 710px;
+      padding: 1rem;
+      margin: 0 auto;
     }
 
     h2 {
       color: #465D91;
     }
 
+    label {
+      display: block;
+      margin-top: 1em;
+    }
+
     input, button, select {
-      font-family: 'Roboto Mono', monospace;
+      font-family: 'Roboto', sans-serif;
       padding: 0.5em;
       margin: 0.5em 0;
       border: 1px solid #757780;
       border-radius: 5px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    select {
+      width: 100%;
     }
 
     button {
@@ -43,29 +62,50 @@
       border-radius: 5px;
       padding: 0.7em;
       margin-top: 1em;
+      font-family: 'Roboto Mono', monospace;
     }
 
     #input_prompt {
       font-size: 1.1em;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    #loading_icon {
+      display: none;
+      width: 20px;
+      height: 20px;
+      vertical-align: middle;
+      margin-left: 10px;
     }
   </style>
 </head>
 <body>
 
-  <h2>Chat with Llama 3</h2>
-  <label for="model_select">Select Model:</label>
-  <select id="model_select">
-    <option value="" disabled selected>Select a model</option>
-    <option value="https://huggingface.co/ggml-org/models/resolve/main/tinyllamas/stories260K.gguf">TinyLlama Stories (260K)</option>
-    <option value="https://huggingface.co/ggml-org/models/resolve/main/bert-bge-small/ggml-model-f16.gguf">BERT Small</option>
-    <option value="https://huggingface.co/TinyLlama/TinyLlama-1.1B-Chat-v0.6/resolve/main/ggml-model-q4_0.gguf">TinyLlama 1.1B Chat</option>
-  </select><br/>
-  <button id="btn_start_cmpl" disabled>Load Model</button> Model: <span id="cmpl_model"></span><br/>
-  Prompt: <input id="input_prompt" value="Once upon a time," disabled/><br/>
-  Number of tokens: <input id="input_n_predict" value="50" type="number" disabled/><br/>
-  <button id="btn_run_cmpl" disabled>Run Completion</button>
-  <br/>
-  <div id="output_cmpl"></div>
+  <div class="container">
+    <h2>Chat with Llama 3</h2>
+    <label for="model_select">Select Model:</label>
+    <select id="model_select">
+      <option value="" disabled selected>Select a model</option>
+      <option value="https://huggingface.co/ggml-org/models/resolve/main/tinyllamas/stories260K.gguf">TinyLlama Stories (260K)</option>
+      <option value="https://huggingface.co/ggml-org/models/resolve/main/bert-bge-small/ggml-model-f16.gguf">BERT Small</option>
+      <option value="https://huggingface.co/TinyLlama/TinyLlama-1.1B-Chat-v0.6/resolve/main/ggml-model-q4_0.gguf">TinyLlama 1.1B Chat</option>
+    </select>
+    <button id="btn_start_cmpl" disabled>Load Model</button> <span id="loading_container"><svg id="loading_icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="35" stroke="#465D91" stroke-width="10" fill="none" stroke-dasharray="164.93361431346415 56.97787143782138">
+        <animateTransform attributeName="transform" type="rotate" repeatCount="indefinite" dur="1s" keyTimes="0;1" values="0 50 50;360 50 50"></animateTransform>
+      </circle>
+    </svg></span> Model: <span id="cmpl_model"></span>
+
+    <label for="input_prompt">Prompt:</label>
+    <textarea id="input_prompt" disabled>Once upon a time,</textarea>
+
+    <label for="input_n_predict">Number of tokens:</label>
+    <input id="input_n_predict" value="50" type="number" disabled/>
+
+    <button id="btn_run_cmpl" disabled>Run Completion</button>
+    <div id="output_cmpl"></div>
+  </div>
 
   <script type="module">
     import { Wllama } from 'https://cdn.jsdelivr.net/npm/@wllama/wllama/esm/index.js';
@@ -86,6 +126,7 @@
       const elemNPredict = document.getElementById('input_n_predict');
       const elemBtnCompletions = document.getElementById('btn_run_cmpl');
       const elemOutputCmpl = document.getElementById('output_cmpl');
+      const elemLoadingIcon = document.getElementById('loading_icon');
 
       elemModelSelect.onchange = () => {
         elemBtnStartCmpl.disabled = false;
@@ -94,9 +135,11 @@
 
       elemBtnStartCmpl.onclick = async () => {
         elemBtnStartCmpl.disabled = true;
+        elemLoadingIcon.style.display = 'inline-block';
         const modelUrl = elemModelSelect.value;
         const wllama = new Wllama(CONFIG_PATHS);
         await wllama.loadModelFromUrl(modelUrl);
+        elemLoadingIcon.style.display = 'none';
         elemInput.disabled = false;
         elemNPredict.disabled = false;
         elemBtnCompletions.disabled = false;
