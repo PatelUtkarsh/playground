@@ -3,264 +3,373 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Get random card</title>
+    <title>Draw random card or from a Deck</title>
     <style>
         :root {
-            --md-primary: #465D91;
-            --md-primary-container: #D9E2FF;
-            --md-on-primary: #FFFFFF;
-            --md-on-primary-container: #001944;
-            --md-secondary: #575E71;
-            --md-secondary-container: #DBE2F9;
-            --md-on-secondary: #FFFFFF;
-            --md-surface: #FAF8FF;
-            --md-surface-container: #EEEDF4;
-            --md-outline: #757780;
-            --md-outline-variant: #C5C6D0;
-            --md-shadow: rgba(0, 0, 0, 0.3);
-        }
-
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --md-primary: #AFC6FF;
-                --md-primary-container: #2D4578;
-                --md-on-primary: #142F60;
-                --md-on-primary-container: #D9E2FF;
-                --md-secondary: #BFC6DC;
-                --md-secondary-container: #404659;
-                --md-on-secondary: #293042;
-                --md-surface: #121318;
-                --md-surface-container: #1E1F25;
-                --md-outline: #8F9099;
-                --md-outline-variant: #44464F;
-                --md-shadow: rgba(0, 0, 0, 0.5);
-            }
+            --primary: #465D91;
+            --primary-container: #D9E2FF;
+            --on-primary: #FFFFFF;
+            --on-primary-container: #001944;
+            --surface: #FAF8FF;
+            --surface-variant: #E1E2EC;
+            --outline: #757780;
+            --shadow: rgba(0, 0, 0, 0.2);
+            --card-red: #BA1A1A;
+            --card-black: #1A1B20;
         }
 
         body {
+            margin: 0;
+            padding: 20px;
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--surface);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        button {
+            background-color: var(--primary);
+            color: var(--on-primary);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .card-area {
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            background: var(--md-surface);
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            transition: background-color 0.3s ease;
+            min-height: 400px;
+            perspective: 1000px;
         }
 
         .card {
-            width: 200px;
-            height: 280px;
+            width: 240px;
+            height: 336px;
             position: relative;
-            perspective: 1000px;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
             cursor: pointer;
         }
 
-        .card-inner {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            text-align: center;
-            transition: transform 0.8s;
-            transform-style: preserve-3d;
-        }
-
-        .card.flipped .card-inner {
+        .card.flipped {
             transform: rotateY(180deg);
         }
 
-        .card-front, .card-back {
+        .card-face {
             position: absolute;
             width: 100%;
             height: 100%;
             backface-visibility: hidden;
-            border-radius: 16px;
-            box-shadow: 0 4px 8px var(--md-shadow);
-        }
-
-        .card-front {
-            background: var(--md-primary-container);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border: 2px solid var(--md-outline-variant);
-        }
-
-        .card-pattern {
-            width: 80%;
-            height: 80%;
-            background:
-                radial-gradient(circle at 50% 50%, var(--md-primary) 2px, transparent 3px) 0 0/20px 20px,
-                radial-gradient(circle at 50% 50%, var(--md-primary) 2px, transparent 3px) 10px 10px/20px 20px;
-            opacity: 0.2;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px var(--shadow);
+            background: var(--surface);
+            border: 1px solid var(--outline);
         }
 
         .card-back {
-            background: var(--md-surface-container);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-container) 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: var(--on-primary);
+            background-image:
+                repeating-linear-gradient(45deg,
+                    transparent 0px,
+                    transparent 10px,
+                    rgba(255,255,255,0.1) 10px,
+                    rgba(255,255,255,0.1) 20px);
+        }
+
+        .card-front {
+            background: var(--surface);
             transform: rotateY(180deg);
-            border: 8px solid var(--md-surface-container);
-            box-sizing: border-box;
+            padding: 15px;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            font-family: 'Times New Roman', serif;
         }
 
-        .card-content {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            background: var(--md-surface);
-            border-radius: 8px;
-            border: 1px solid var(--md-outline-variant);
-        }
-
-        .corner {
-            position: absolute;
+        .card-corner {
             display: flex;
             flex-direction: column;
             align-items: center;
-            font-size: 20px;
+            font-size: 24px;
             line-height: 1;
-            font-weight: bold;
-            color: var(--md-on-primary-container);
         }
 
-        .corner.top-left {
-            top: 8px;
-            left: 8px;
+        .card-corner.top-left {
+            align-self: start;
+            justify-self: start;
         }
 
-        .corner.bottom-right {
-            bottom: 8px;
-            right: 8px;
+        .card-corner.bottom-right {
+            align-self: end;
+            justify-self: end;
             transform: rotate(180deg);
         }
 
-        .corner .value {
-            margin-bottom: 2px;
+        .card-center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 72px;
         }
 
-        .center-symbol {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 80px;
-            color: var(--md-on-primary-container);
+        .history {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .mini-card {
+            width: 60px;
+            height: 84px;
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: 6px;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            padding: 4px;
+            font-family: 'Times New Roman', serif;
+            position: relative;
+            box-shadow: 0 2px 4px var(--shadow);
+        }
+
+        .mini-corner {
+            font-size: 10px;
+            line-height: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .mini-corner.top-left {
+            align-self: start;
+            justify-self: start;
+        }
+
+        .mini-corner.bottom-right {
+            align-self: end;
+            justify-self: end;
+            transform: rotate(180deg);
+        }
+
+        .mini-center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
         }
 
         .red {
-            color: #BA1A1A !important;
+            color: var(--card-red);
         }
 
-        .reset-button {
-            position: absolute;
-            bottom: 20px;
-            padding: 12px 24px;
-            background: var(--md-primary);
-            color: var(--md-on-primary);
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 4px var(--md-shadow);
+        .black {
+            color: var(--card-black);
         }
 
-        .reset-button:hover {
-            background: var(--md-primary-container);
-            color: var(--md-on-primary-container);
+        .card-value {
+            font-size: 28px;
+            font-weight: bold;
         }
 
-        @media (max-width: 300px) {
-            .card {
-                width: 160px;
-                height: 224px;
-            }
-            .corner {
-                font-size: 16px;
-            }
-            .center-symbol {
-                font-size: 60px;
-            }
+        .card-suit {
+            font-size: 24px;
+        }
+
+        .mini-value {
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .mini-suit {
+            font-size: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="card">
-        <div class="card-inner">
-            <div class="card-front">
-                <div class="card-pattern"></div>
-            </div>
-            <div class="card-back">
-                <div class="card-content">
-                    <div class="corner top-left">
-                        <span class="value">A</span>
-                        <span class="suit">♠</span>
-                    </div>
-                    <div class="center-symbol">♠</div>
-                    <div class="corner bottom-right">
-                        <span class="value">A</span>
-                        <span class="suit">♠</span>
-                    </div>
+    <div class="controls">
+        <button onclick="switchMode('random')">Random Mode</button>
+        <button onclick="switchMode('deck')">Deck Mode</button>
+        <button onclick="resetDeck()" id="resetBtn" style="display: none;">Reset Deck</button>
+    </div>
+    <div class="card-area">
+        <div class="card" onclick="handleCardClick()">
+            <div class="card-face card-back">🎴</div>
+            <div class="card-face card-front">
+                <div class="card-corner top-left">
+                    <span class="card-value"></span>
+                    <span class="card-suit"></span>
+                </div>
+                <div class="card-center">
+                    <span class="card-suit center-suit"></span>
+                </div>
+                <div class="card-corner bottom-right">
+                    <span class="card-value"></span>
+                    <span class="card-suit"></span>
                 </div>
             </div>
         </div>
     </div>
-    <button class="reset-button" onclick="resetCard()">Reset Card</button>
+    <div class="history" id="history"></div>
 
     <script>
-        const suits = ['♠', '♥', '♣', '♦'];
+        const suits = ['♠', '♥', '♦', '♣'];
         const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
-        const card = document.querySelector('.card');
-        const cardContent = document.querySelector('.card-content');
-        let isFlipped = false;
+        let deck = [];
+        let usedCards = [];
+        let currentMode = 'random';
+        let cardVisible = false;
+
+        function createDeck() {
+            deck = [];
+            for (let suit of suits) {
+                for (let value of values) {
+                    deck.push({ value, suit });
+                }
+            }
+            shuffleDeck();
+        }
+
+        function shuffleDeck() {
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+        }
 
         function getRandomCard() {
             const suit = suits[Math.floor(Math.random() * suits.length)];
             const value = values[Math.floor(Math.random() * values.length)];
-            const isRed = suit === '♥' || suit === '♦';
-            return { suit, value, isRed };
+            return { value, suit };
         }
 
-        function updateCardContent(randomCard) {
-            const cornerTopLeft = document.createElement('div');
-            cornerTopLeft.className = 'corner top-left' + (randomCard.isRed ? ' red' : '');
-            cornerTopLeft.innerHTML = `
-                <span class="value">${randomCard.value}</span>
-                <span class="suit">${randomCard.suit}</span>
-            `;
-
-            const cornerBottomRight = document.createElement('div');
-            cornerBottomRight.className = 'corner bottom-right' + (randomCard.isRed ? ' red' : '');
-            cornerBottomRight.innerHTML = `
-                <span class="value">${randomCard.value}</span>
-                <span class="suit">${randomCard.suit}</span>
-            `;
-
-            const centerSymbol = document.createElement('div');
-            centerSymbol.className = 'center-symbol' + (randomCard.isRed ? ' red' : '');
-            centerSymbol.textContent = randomCard.suit;
-
-            cardContent.innerHTML = '';
-            cardContent.appendChild(cornerTopLeft);
-            cardContent.appendChild(centerSymbol);
-            cardContent.appendChild(cornerBottomRight);
+        function getDeckCard() {
+            if (deck.length === 0) {
+                return null;
+            }
+            const card = deck.pop();
+            usedCards.push(card);
+            updateHistory();
+            return card;
         }
 
-        function flipCard() {
-            if (!isFlipped) {
-                const randomCard = getRandomCard();
-                updateCardContent(randomCard);
-                card.classList.add('flipped');
-                isFlipped = true;
+        function isRedSuit(suit) {
+            return suit === '♥' || suit === '♦';
+        }
+
+        function updateCardDisplay(card) {
+            const cardFront = document.querySelector('.card-front');
+            const colorClass = isRedSuit(card.suit) ? 'red' : 'black';
+
+            cardFront.className = `card-face card-front ${colorClass}`;
+
+            const values = cardFront.querySelectorAll('.card-value');
+            const suits = cardFront.querySelectorAll('.card-suit');
+            const centerSuit = cardFront.querySelector('.center-suit');
+
+            values.forEach(el => el.textContent = card.value);
+            suits.forEach(el => el.textContent = card.suit);
+            centerSuit.textContent = card.suit;
+        }
+
+        function createMiniCard(card) {
+            const miniCard = document.createElement('div');
+            miniCard.className = `mini-card ${isRedSuit(card.suit) ? 'red' : 'black'}`;
+
+            miniCard.innerHTML = `
+                <div class="mini-corner top-left">
+                    <span class="mini-value">${card.value}</span>
+                    <span class="mini-suit">${card.suit}</span>
+                </div>
+                <div class="mini-center">
+                    <span class="mini-suit">${card.suit}</span>
+                </div>
+                <div class="mini-corner bottom-right">
+                    <span class="mini-value">${card.value}</span>
+                    <span class="mini-suit">${card.suit}</span>
+                </div>
+            `;
+
+            return miniCard;
+        }
+
+        function updateHistory() {
+            const history = document.getElementById('history');
+            history.innerHTML = '';
+            if (currentMode === 'deck') {
+                usedCards.forEach(card => {
+                    history.appendChild(createMiniCard(card));
+                });
             }
         }
 
-        function resetCard() {
-            card.classList.remove('flipped');
-            isFlipped = false;
+        function handleCardClick() {
+            const card = document.querySelector('.card');
+
+            if (!cardVisible) {
+                const newCard = currentMode === 'random' ? getRandomCard() : getDeckCard();
+                if (newCard) {
+                    updateCardDisplay(newCard);
+                    card.classList.add('flipped');
+                    cardVisible = true;
+                }
+            } else {
+                card.classList.remove('flipped');
+                cardVisible = false;
+            }
         }
 
-        card.addEventListener('click', flipCard);
+        function switchMode(mode) {
+            currentMode = mode;
+            const resetBtn = document.getElementById('resetBtn');
+            resetBtn.style.display = mode === 'deck' ? 'block' : 'none';
+
+            if (mode === 'deck') {
+                createDeck();
+                usedCards = [];
+                updateHistory();
+            }
+
+            // Reset card state
+            const card = document.querySelector('.card');
+            card.classList.remove('flipped');
+            cardVisible = false;
+        }
+
+        function resetDeck() {
+            createDeck();
+            usedCards = [];
+            updateHistory();
+            const card = document.querySelector('.card');
+            card.classList.remove('flipped');
+            cardVisible = false;
+        }
+
+        // Initialize
+        switchMode('random');
     </script>
 </body>
 </html>
