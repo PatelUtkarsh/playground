@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PHP Unserializer Playground</title>
+    <meta name="description" content="Local PHP unserializer tool to safely convert PHP serialized strings to human-readable format. Run PHP unserialize() locally in your browser.">
+    <meta name="keywords" content="PHP, unserialize, serialization, local tool, PHP playground, web development">
+    <meta name="robots" content="index, follow">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:title" content="PHP Unserializer Playground">
+    <meta property="og:description" content="Local PHP unserializer tool to safely convert PHP serialized strings to human-readable format">
+    <meta property="og:type" content="website">
+    <link rel="canonical" href="php-unserializer.html">
+    <style>
+        :root {
+            --primary: #465D91;
+            --surface-tint: #465D91;
+            --on-primary: #FFFFFF;
+            --primary-container: #D9E2FF;
+            --on-primary-container: #001944;
+            --surface: #FAF8FF;
+            --on-surface: #1A1B20;
+            --surface-variant: #E1E2EC;
+            --outline: #757780;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            background: var(--surface);
+            color: var(--on-surface);
+            font-family: 'Roboto', sans-serif;
+            min-height: 100vh;
+        }
+
+        .playground-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            border: 1px solid var(--outline);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 40px); /* Account for body padding */
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 16px;
+            padding: 16px;
+            background: var(--surface-variant);
+            border-bottom: 1px solid var(--outline);
+            align-items: center;
+            flex: 0 0 auto;
+        }
+
+        button {
+            background: var(--primary);
+            color: var(--on-primary);
+            border: none;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        button:hover:not(:disabled) {
+            opacity: 0.9;
+        }
+
+        .editor-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+            flex: 1;
+            min-height: 0; /* Important for preventing overflow */
+            overflow: hidden;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100%;
+            padding: 16px;
+            border: 1px solid var(--outline);
+            border-radius: 4px;
+            background: var(--surface);
+            color: var(--on-surface);
+            font-family: 'Roboto Mono', monospace;
+            resize: none;
+            font-size: 14px;
+            overflow-y: auto;
+        }
+
+        #output {
+            width: 100%;
+            height: 100%;
+            padding: 16px;
+            border: 1px solid var(--outline);
+            border-radius: 4px;
+            background: var(--surface);
+            white-space: pre-wrap;
+            overflow-y: auto;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 14px;
+        }
+
+        .error {
+            color: #BA1A1A;
+            background: #FFDAD6;
+            padding: 8px;
+            border-radius: 4px;
+            margin-top: 8px;
+        }
+
+        .status {
+            margin-left: auto;
+            font-size: 14px;
+            color: var(--outline);
+        }
+
+        .title {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--on-surface);
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Roboto+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="playground-container">
+    <div class="toolbar">
+        <span class="title">PHP Unserializer in Browser using WebAssembly</span>
+        <button id="runButton" disabled>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8 5v14l11-7z"/>
+            </svg>
+            Unserialize
+        </button>
+        <span id="status" class="status">Initializing PHP...</span>
+    </div>
+
+    <div class="editor-container">
+        <textarea id="code" spellcheck="false" placeholder="Enter PHP serialized string here...">a:2:{i:0;s:5:"Hello";i:1;s:5:"World";}</textarea>
+        <div id="output"></div>
+    </div>
+</div>
+
+<script type="module">
+    let php;
+    const output = document.getElementById('output');
+    const runButton = document.getElementById('runButton');
+    const status = document.getElementById('status');
+    let outputBuffer = '';
+    let phpVersion = '';
+    let isGettingVersion = false;
+
+    function updateOutput(text, isError = false) {
+        if (isError) {
+            output.innerHTML += `<div class="error">${text}</div>`;
+        } else {
+            output.textContent = text;
+        }
+    }
+
+    function clearOutput() {
+        output.textContent = '';
+        outputBuffer = '';
+    }
+
+    async function getPhpVersion() {
+        let versionOutput = '';
+        isGettingVersion = true;
+
+        try {
+            await php.run('<?php echo PHP_VERSION;?>');
+            isGettingVersion = false;
+            return phpVersion;
+        } catch (e) {
+            console.error('Error getting PHP version:', e);
+            isGettingVersion = false;
+            return '8.3.0';
+        }
+    }
+
+    async function initPHP() {
+        try {
+            const { PhpWeb } = await import('https://cdn.jsdelivr.net/npm/php-wasm@0.0.9-alpha-27/PhpWeb.mjs');
+            php = new PhpWeb();
+
+            // Main output handler
+            php.addEventListener('output', (event) => {
+                if (isGettingVersion) {
+                    phpVersion = event.detail.trim();
+                } else {
+                    outputBuffer += event.detail;
+                    updateOutput(outputBuffer);
+                }
+            });
+
+            php.addEventListener('error', (event) => {
+                updateOutput(event.detail, true);
+            });
+
+            await php.ready;
+
+            // Get and store PHP version after initialization
+            await getPhpVersion();
+            status.textContent = `PHP ${phpVersion} Ready`;
+            runButton.disabled = false;
+            clearOutput();
+        } catch (e) {
+            status.textContent = 'Failed to initialize PHP';
+            updateOutput(`Failed to initialize PHP: ${e.message}`, true);
+            console.error('Failed to initialize PHP:', e);
+        }
+    }
+
+    async function unserializeData() {
+        if (!php) return;
+
+        try {
+            runButton.disabled = true;
+            status.textContent = 'Processing...';
+            clearOutput();
+
+            const serializedData = document.getElementById('code').value;
+            const code = `<?php
+            try {
+                $data = unserialize('${serializedData.replace(/'/g, "\\'")}');
+                var_export($data);
+            } catch (Exception $e) {
+                echo "Error: " . $e->getMessage();
+            }
+            ?>`;
+
+            await php.run(code);
+        } catch (e) {
+            updateOutput(e.message, true);
+        } finally {
+            runButton.disabled = false;
+            status.textContent = `PHP ${phpVersion} Ready`;
+        }
+    }
+
+    runButton.addEventListener('click', unserializeData);
+    initPHP();
+</script>
+</body>
+</html>

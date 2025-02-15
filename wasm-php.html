@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Online PHP WebAssembly Playground - Test and run PHP 8.2 and 8.3 code directly in your browser">
+    <meta name="keywords" content="PHP, WebAssembly, WASM, PHP 8.3, PHP 8.2, Online PHP Editor, PHP Playground">
+    <meta name="author" content="PHP WASM Playground">
+    <meta property="og:title" content="PHP WebAssembly Playground">
+    <meta property="og:description" content="Run PHP 8.2 and 8.3 code directly in your browser using WebAssembly">
+    <meta property="og:type" content="website">
+    <title>PHP WebAssembly Playground - Run PHP 8.2 and 8.3 in Browser</title>
+    <style>
+        :root {
+            --primary: #465D91;
+            --surface-tint: #465D91;
+            --on-primary: #FFFFFF;
+            --primary-container: #D9E2FF;
+            --on-primary-container: #001944;
+            --surface: #FAF8FF;
+            --on-surface: #1A1B20;
+            --surface-variant: #E1E2EC;
+            --outline: #757780;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            background: var(--surface);
+            color: var(--on-surface);
+            font-family: 'Roboto', sans-serif;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .playground-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            border: 1px solid var(--outline);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 40px);
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 16px;
+            padding: 16px;
+            background: var(--surface-variant);
+            border-bottom: 1px solid var(--outline);
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        button {
+            background: var(--primary);
+            color: var(--on-primary);
+            border: none;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        button:hover:not(:disabled) {
+            opacity: 0.9;
+        }
+
+        .editor-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100%;
+            padding: 16px;
+            border: 1px solid var(--outline);
+            border-radius: 4px;
+            background: var(--surface);
+            color: var(--on-surface);
+            font-family: 'Roboto Mono', monospace;
+            resize: none;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        #output {
+            padding: 16px;
+            border: 1px solid var(--outline);
+            border-radius: 4px;
+            background: var(--surface);
+            white-space: pre-wrap;
+            overflow-y: auto;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 14px;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        .error {
+            color: #BA1A1A;
+            background: #FFDAD6;
+            padding: 8px;
+            border-radius: 4px;
+            margin-top: 8px;
+        }
+
+        .status {
+            margin-left: auto;
+            font-size: 14px;
+            color: var(--outline);
+        }
+
+        .version-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .version-label {
+            font-size: 14px;
+            color: var(--on-surface);
+        }
+
+        select {
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: 1px solid var(--outline);
+            background: var(--surface);
+            color: var(--on-surface);
+            font-size: 14px;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Roboto+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="playground-container">
+        <div class="toolbar">
+            <div class="version-selector">
+                <span class="version-label">PHP Version:</span>
+                <select id="phpVersion">
+                    <option value="@0.0.9-alpha-27">PHP 8.3 (Latest)</option>
+                    <option value="@0.0.8">PHP 8.2</option>
+                </select>
+            </div>
+            <button id="runButton" disabled>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z"/>
+                </svg>
+                Run Code
+            </button>
+            <span id="status" class="status">Initializing PHP...</span>
+        </div>
+
+        <div class="editor-container">
+            <textarea id="code" spellcheck="false"><?php
+echo "🚀 PHP " . PHP_VERSION . " Ready!\n\n";
+
+// Example using match expression (PHP 8.0+)
+$result = match((int)date('H')) {
+    0,1,2,3,4,5 => '🌙 Late Night',
+    6,7,8 => '🌅 Morning',
+    9,10,11 => '☀️ Late Morning',
+    12,13,14 => '🌞 Afternoon',
+    15,16,17 => '🌇 Evening',
+    default => '🌃 Night'
+};
+
+echo "It's {$result} right now!\n\n";
+
+// Fibonacci sequence example
+function fibonacci(int $n): int {
+    return $n <= 1 ? $n : fibonacci($n - 1) + fibonacci($n - 2);
+}
+
+echo "Fibonacci(10): " . fibonacci(10) . "\n";
+?></textarea>
+            <div id="output"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        const PHP_VERSIONS = {
+            '@0.0.9-alpha-27': {
+                label: 'PHP 8.3 (Latest)',
+                type: 'module',
+                file: 'PhpWeb.mjs',
+                methodName: 'run'
+            },
+            '@0.0.8': {
+                label: 'PHP 8.2',
+                type: 'module',
+                file: 'PhpWeb.mjs',
+                methodName: 'run'
+            }
+        };
+
+        const moduleCache = new Map();
+        let currentScript = null;
+        let php;
+        let currentConfig;
+        const output = document.getElementById('output');
+        const runButton = document.getElementById('runButton');
+        const status = document.getElementById('status');
+        const versionSelect = document.getElementById('phpVersion');
+        const phpInstances = new Map();
+        let outputBuffer = '';
+
+        async function cleanupPHP() {
+            if (php) {
+                try {
+                    // Remove event listeners
+                    if (php.removeEventListener) {
+                        php.removeEventListener('output', () => {});
+                        php.removeEventListener('error', () => {});
+                    }
+
+                    // Clear message handlers
+                    if (php.onMessage) {
+                        php.onMessage = null;
+                    }
+                    if (php.onError) {
+                        php.onError = null;
+                    }
+
+                    // Terminate if possible
+                    if (php.terminate) {
+                        await php.terminate();
+                    }
+
+                    // Clear references
+                    php = null;
+                    outputBuffer = '';
+
+                    // Clear cache
+                    phpInstances.clear();
+                    moduleCache.clear();
+
+                    // Remove any existing script tags
+                    if (currentScript) {
+                        document.head.removeChild(currentScript);
+                        currentScript = null;
+                    }
+
+                    // Clear global PHP reference if it exists
+                    if (window.PHP) {
+                        window.PHP = undefined;
+                    }
+                } catch (e) {
+                    console.warn('Cleanup warning:', e);
+                }
+            }
+        }
+
+        async function waitForGlobal(key, timeout = 10000) {
+            const start = Date.now();
+            return new Promise((resolve, reject) => {
+                const check = () => {
+                    if (window[key]) {
+                        resolve(window[key]);
+                    } else if (Date.now() - start > timeout) {
+                        reject(new Error(`Timeout waiting for ${key}`));
+                    } else {
+                        setTimeout(check, 100);
+                    }
+                };
+                check();
+            });
+        }
+
+        async function loadScript(url) {
+            await cleanupPHP(); // Clean up before loading new script
+
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = url;
+                script.onload = async () => {
+                    try {
+                        await waitForGlobal('PHP');
+                        if (window.PHP.Ready) {
+                            await window.PHP.Ready;
+                        }
+                        resolve(window.PHP);
+                    } catch (e) {
+                        reject(e);
+                    }
+                };
+                script.onerror = reject;
+                document.head.appendChild(script);
+                currentScript = script;
+            });
+        }
+
+        async function loadPhpModule(version) {
+            await cleanupPHP(); // Clean up before loading new module
+
+            const config = PHP_VERSIONS[version];
+            if (!config) {
+                throw new Error(`Unsupported PHP version: ${version}`);
+            }
+
+            const baseUrl = `https://cdn.jsdelivr.net/npm/php-wasm${version}`;
+
+            try {
+                if (config.type === 'module') {
+                    const { PhpWeb } = await import(`${baseUrl}/${config.file}`);
+                    return { constructor: PhpWeb, config };
+                } else {
+                    await loadScript(`${baseUrl}${config.file}`);
+                    return {
+                        constructor: window.PHP,
+                        config
+                    };
+                }
+            } catch (e) {
+                console.error(`Failed to load PHP version ${version}:`, e);
+                throw e;
+            }
+        }
+
+        function updateOutput(text, isError = false) {
+            if (isError) {
+                output.innerHTML += `<div class="error">${text}</div>`;
+            } else {
+                output.textContent = text;
+            }
+        }
+
+        function clearOutput() {
+            output.textContent = '';
+            outputBuffer = '';
+        }
+
+        async function execPhp(code) {
+            if (!php || !currentConfig) {
+                throw new Error('PHP not initialized');
+            }
+
+            return new Promise((resolve, reject) => {
+                try {
+                    if (currentConfig.methodName === 'run') {
+                        php.run(code).then(resolve).catch(reject);
+                    } else {
+                        outputBuffer = '';
+                        php.exec(code);
+                        resolve(outputBuffer);
+                    }
+                } catch (e) {
+                    reject(e);
+                }
+            });
+        }
+
+        async function setupEventListeners(phpInstance, config) {
+            if (config.isLegacy) {
+                phpInstance.onMessage = (data) => {
+                    outputBuffer += data;
+                    updateOutput(outputBuffer);
+                };
+                phpInstance.onError = (error) => {
+                    updateOutput(error, true);
+                };
+            } else {
+                phpInstance.addEventListener('output', (event) => {
+                    if (!event.detail.includes('PHP_VERSION')) {
+                        outputBuffer += event.detail;
+                        updateOutput(outputBuffer);
+                    }
+                });
+
+                phpInstance.addEventListener('error', (event) => {
+                    updateOutput(event.detail, true);
+                });
+            }
+        }
+
+        async function runCode() {
+            if (!php) return;
+
+            try {
+                runButton.disabled = true;
+                status.textContent = 'Running...';
+                clearOutput();
+                outputBuffer = '';
+
+                // Get the code before cleanup
+                const code = document.getElementById('code').value;
+                const currentVersion = versionSelect.value;
+
+                // Clean up the current PHP instance
+                await cleanupPHP();
+
+                // Reinitialize PHP with a fresh instance
+                await initPHP(currentVersion);
+
+                // Run the code on the fresh instance
+                await execPhp(code);
+            } catch (e) {
+                updateOutput(e.message, true);
+            } finally {
+                // Get version from the version selector instead
+                const versionLabel = versionSelect.options[versionSelect.selectedIndex].text;
+                status.textContent = `${versionLabel} Ready!`;
+                runButton.disabled = false;
+            }
+        }
+
+        async function initPHP(versionTag) {
+            try {
+                status.textContent = 'Initializing PHP...';
+                runButton.disabled = true;
+                clearOutput();
+                updateOutput('Loading PHP environment...');
+
+                // Clean up before initialization
+                await cleanupPHP();
+
+                const { constructor: PhpConstructor, config } = await loadPhpModule(versionTag);
+                currentConfig = config;
+
+                if (config.isLegacy) {
+                    php = PhpConstructor;
+                } else {
+                    php = new PhpConstructor();
+                }
+
+                await setupEventListeners(php, config);
+
+                if (php.ready) {
+                    await php.ready;
+                } else if (window.PHP && window.PHP.Ready) {
+                    await window.PHP.Ready;
+                } else {
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+
+                // Simple test without version check
+                await execPhp('<?php echo "Test";?>');
+
+                // Use version from selector for status
+                const versionLabel = versionSelect.options[versionSelect.selectedIndex].text;
+                status.textContent = `${versionLabel} Ready!`;
+                clearOutput();
+                runButton.disabled = false;
+
+            } catch (e) {
+                status.textContent = 'Failed to initialize PHP';
+                updateOutput(`Failed to initialize PHP: ${e.message}`, true);
+                console.error('Failed to initialize PHP:', e);
+                runButton.disabled = true;
+            }
+        }
+
+        function initVersionSelector() {
+            versionSelect.innerHTML = Object.entries(PHP_VERSIONS)
+                .map(([value, config]) =>
+                    `<option value="${value}">${config.label}</option>`
+                )
+                .join('');
+        }
+
+        // Add event listeners
+        runButton.addEventListener('click', runCode);
+
+        versionSelect.addEventListener('change', async (event) => {
+            try {
+                status.textContent = 'Switching version...';
+                runButton.disabled = true;
+                await initPHP(event.target.value);
+            } catch (e) {
+                console.error('Version switch failed:', e);
+                status.textContent = 'Version switch failed';
+                updateOutput('Version switch failed: ' + e.message, true);
+            }
+        });
+
+        // Initialize the UI and PHP
+        initVersionSelector();
+        initPHP(versionSelect.value);
+
+        // Cleanup on page unload
+        window.addEventListener('unload', cleanupPHP);
+    </script>
+</body>
+</html>
