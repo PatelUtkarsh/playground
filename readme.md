@@ -19,3 +19,15 @@ Demo of SQLite 3 compiled to WebAssembly using [`@sqlite.org/sqlite-wasm`](https
 Demo of LLMA 3 compiled to WebAssembly using [`@wllama/wllama`](https://github.com/ngxson/wllama) package.
 
 [<img src="https://img.shields.io/badge/DEMO-Try%20it%20out!-blue?style=for-the-badge&logo=github" alt="Demo Button" height="30"/>](https://tools.utkarshpatel.com/llama-3-wasm.html)
+
+### 4. PHP Playground using WebAssembly
+
+Demo of PHP compiled to WebAssembly using [`seanmorris/php-wasm`](https://github.com/seanmorris/php-wasm/) package.
+
+[<img src="https://img.shields.io/badge/DEMO-Try%20it%20out!-blue?style=for-the-badge&logo=github" alt="Demo Button" height="30"/>](https://tools.utkarshpatel.com/wasm-php.html)
+
+### 5. PHP Unserialize
+
+PHP Unserialize using WebAssembly.
+
+[<img src="https://img.shields.io/badge/DEMO-Try%20it%20out!-blue?style=for-the-badge&logo=github" alt="Demo Button" height="30"/>](https://tools.utkarshpatel.com/php-unserialize.html)
