@@ -31,3 +31,9 @@ Demo of PHP compiled to WebAssembly using [`seanmorris/php-wasm`](https://github
 PHP Unserialize using WebAssembly.
 
 [<img src="https://img.shields.io/badge/DEMO-Try%20it%20out!-blue?style=for-the-badge&logo=github" alt="Demo Button" height="30"/>](https://tools.utkarshpatel.com/php-unserialize.html)
+
+### 6. Random card generator
+
+This is a random card generator created with JavaScript. It offers two modes: deck mode, which ensures no card is repeated, and random mode, which allows card repetition.
+
+[<img src="https://img.shields.io/badge/DEMO-Try%20it%20out!-blue?style=for-the-badge&logo=github" alt="Demo Button" height="30"/>](https://tools.utkarshpatel.com/random-card.html)
