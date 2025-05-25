@@ -37,3 +37,9 @@ PHP Unserialize using WebAssembly.
 This is a random card generator created with JavaScript. It offers two modes: deck mode, which ensures no card is repeated, and random mode, which allows card repetition.
 
 [<img src="https://img.shields.io/badge/DEMO-Try%20it%20out!-blue?style=for-the-badge&logo=github" alt="Demo Button" height="30"/>](https://tools.utkarshpatel.com/random-card.html)
+
+
+### 7. Simple visual countdown timer
+Visual countdown timer with full-screen flashing alert for silent environments. Set hours, minutes, and seconds for a visual notification.
+
+[<img src="https://img.shields.io/badge/DEMO-Try%20it%20out!-blue?style=for-the-badge&logo=github" alt="Demo Button" height="30"/>](https://tools.utkarshpatel.com/simple-countdown-timer.html)
