@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Visual Countdown Timer</title>
+    <!-- Basic SEO Meta Tags -->
+    <meta
+      name="description"
+      content="Visual countdown timer with full-screen flashing alert for silent environments. Set hours, minutes, and seconds for a visual notification."
+    />
+    <meta
+      name="keywords"
+      content="countdown timer, visual timer, silent timer, flashing timer, visual alert, meeting timer"
+    />
+    <style>
+      :root {
+        /* Light theme colors from the material design */
+        --primary: #465d91;
+        --primary-container: #d9e2ff;
+        --on-primary-container: #001944;
+        --error: #ba1a1a;
+        --surface: #faf8ff;
+        --on-surface: #1a1b20;
+        --outline: #757780;
+      }
+
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        margin: 0;
+        background-color: var(--surface);
+        color: var(--on-surface);
+        transition: background-color 0.5s;
+      }
+
+      body.flashing {
+        animation: body-flash 1s infinite;
+      }
+
+      @keyframes body-flash {
+        0%,
+        100% {
+          background-color: var(--surface);
+        }
+        50% {
+          background-color: var(--on-surface);
+        }
+      }
+
+      .container {
+        text-align: center;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        background-color: white;
+        max-width: 500px;
+        width: 90%;
+        transition: all 0.5s;
+        z-index: 10;
+      }
+
+      .container.flashing {
+        animation: container-flash 1s infinite;
+      }
+
+      @keyframes container-flash {
+        0%,
+        100% {
+          background-color: white;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        50% {
+          background-color: var(--on-surface);
+          box-shadow: 0 4px 24px rgba(26, 27, 32, 0.4);
+        }
+      }
+
+      h1 {
+        color: var(--primary);
+        margin-top: 0;
+      }
+
+      .input-group {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      .input-field {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      input {
+        width: 60px;
+        padding: 8px;
+        font-size: 16px;
+        text-align: center;
+        border: 1px solid var(--outline);
+        border-radius: 4px;
+      }
+
+      label {
+        font-size: 14px;
+        margin-top: 4px;
+        color: var(--on-surface);
+      }
+
+      button {
+        background-color: var(--primary);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 5px;
+        transition: background-color 0.2s;
+      }
+
+      button:hover {
+        background-color: #3a4f7d;
+      }
+
+      #timer-display {
+        font-size: 48px;
+        font-weight: bold;
+        margin: 30px 0;
+        color: var(--on-primary-container);
+        background-color: var(--primary-container);
+        padding: 20px;
+        border-radius: 8px;
+        transition: all 0.5s;
+      }
+
+      #timer-display.flashing {
+        animation: display-flash 1s infinite;
+      }
+
+      @keyframes display-flash {
+        0%,
+        100% {
+          background-color: var(--primary-container);
+          color: var(--on-primary-container);
+        }
+        50% {
+          background-color: var(--on-surface);
+          color: white;
+        }
+      }
+
+      /* Full screen overlay for flashing effect */
+      #flash-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: var(--on-surface);
+        opacity: 0;
+        pointer-events: none;
+        z-index: 1;
+        transition: opacity 0.5s;
+      }
+
+      #flash-overlay.active {
+        animation: overlay-flash 1s infinite;
+      }
+
+      @keyframes overlay-flash {
+        0%,
+        100% {
+          opacity: 0;
+        }
+        50% {
+          opacity: 0.8;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="flash-overlay"></div>
+
+    <div class="container">
+      <h1>Silent Visual Countdown Timer</h1>
+
+      <div class="input-group">
+        <div class="input-field">
+          <input type="number" id="hours" min="0" max="99" value="0" />
+          <label for="hours">Hours</label>
+        </div>
+        <div class="input-field">
+          <input type="number" id="minutes" min="0" max="59" value="5" />
+          <label for="minutes">Minutes</label>
+        </div>
+        <div class="input-field">
+          <input type="number" id="seconds" min="0" max="59" value="0" />
+          <label for="seconds">Seconds</label>
+        </div>
+      </div>
+
+      <button id="start-btn">Start</button>
+      <button id="reset-btn">Reset</button>
+      <button
+        id="stop-flash-btn"
+        style="display: none; background-color: var(--on-surface)"
+      >
+        Stop Flashing
+      </button>
+
+      <div id="timer-display">00:05:00</div>
+    </div>
+
+    <script>
+      // Get DOM elements
+      const hoursInput = document.getElementById("hours");
+      const minutesInput = document.getElementById("minutes");
+      const secondsInput = document.getElementById("seconds");
+      const timerDisplay = document.getElementById("timer-display");
+      const startBtn = document.getElementById("start-btn");
+      const resetBtn = document.getElementById("reset-btn");
+      const stopFlashBtn = document.getElementById("stop-flash-btn");
+      const flashOverlay = document.getElementById("flash-overlay");
+      const container = document.querySelector(".container");
+
+      let countdownInterval;
+      let timerRunning = false;
+      let isFlashing = false;
+      let endTime;
+
+      // Format time display (add leading zeros)
+      function formatTime(hours, minutes, seconds) {
+        return `${hours.toString().padStart(2, "0")}:${minutes
+          .toString()
+          .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+      }
+
+      // Initialize timer display based on input values
+      function updateTimerDisplay() {
+        const hours = parseInt(hoursInput.value) || 0;
+        const minutes = parseInt(minutesInput.value) || 0;
+        const seconds = parseInt(secondsInput.value) || 0;
+        timerDisplay.textContent = formatTime(hours, minutes, seconds);
+      }
+
+      // Update input fields when changed
+      hoursInput.addEventListener("input", updateTimerDisplay);
+      minutesInput.addEventListener("input", updateTimerDisplay);
+      secondsInput.addEventListener("input", updateTimerDisplay);
+
+      // Start the countdown
+      function startTimer() {
+        if (timerRunning) {
+          // If timer is running, pause it
+          clearInterval(countdownInterval);
+          startBtn.textContent = "Resume";
+          timerRunning = false;
+          return;
+        }
+
+        const hours = parseInt(hoursInput.value) || 0;
+        const minutes = parseInt(minutesInput.value) || 0;
+        const seconds = parseInt(secondsInput.value) || 0;
+
+        // Check if there's valid time to count down
+        const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+        if (totalSeconds <= 0) {
+          alert("Please set a time greater than zero.");
+          return;
+        }
+
+        // Calculate end time
+        endTime = Date.now() + totalSeconds * 1000;
+
+        // If there was flashing, stop it
+        stopFlashing();
+
+        // Update button and state
+        startBtn.textContent = "Pause";
+        timerRunning = true;
+
+        // Start countdown
+        countdownInterval = setInterval(updateCountdown, 1000);
+        updateCountdown(); // Update immediately
+      }
+
+      function updateCountdown() {
+        const timeRemaining = endTime - Date.now();
+
+        if (timeRemaining <= 0) {
+          // Timer finished
+          clearInterval(countdownInterval);
+          timerDisplay.textContent = "00:00:00";
+          startFlashing();
+          startBtn.textContent = "Start";
+          timerRunning = false;
+          return;
+        }
+
+        // Calculate hours, minutes, seconds remaining
+        const secondsRemaining = Math.floor(timeRemaining / 1000);
+        const hours = Math.floor(secondsRemaining / 3600);
+        const minutes = Math.floor((secondsRemaining % 3600) / 60);
+        const seconds = secondsRemaining % 60;
+
+        // Update display
+        timerDisplay.textContent = formatTime(hours, minutes, seconds);
+      }
+
+      function startFlashing() {
+        // Activate all flashing elements
+        isFlashing = true;
+        document.body.classList.add("flashing");
+        timerDisplay.classList.add("flashing");
+        container.classList.add("flashing");
+        flashOverlay.classList.add("active");
+        stopFlashBtn.style.display = "inline-block";
+      }
+
+      function stopFlashing() {
+        // Stop all flashing effects
+        isFlashing = false;
+        document.body.classList.remove("flashing");
+        timerDisplay.classList.remove("flashing");
+        container.classList.remove("flashing");
+        flashOverlay.classList.remove("active");
+        stopFlashBtn.style.display = "none";
+      }
+
+      function resetTimer() {
+        // Stop any running timer
+        clearInterval(countdownInterval);
+        timerRunning = false;
+
+        // Stop flashing if active
+        stopFlashing();
+
+        // Reset UI
+        startBtn.textContent = "Start";
+
+        // Update display based on input fields
+        updateTimerDisplay();
+      }
+
+      // Add event listeners
+      startBtn.addEventListener("click", startTimer);
+      resetBtn.addEventListener("click", resetTimer);
+      stopFlashBtn.addEventListener("click", stopFlashing);
+
+      // Initialize display
+      updateTimerDisplay();
+    </script>
+  </body>
+</html>
