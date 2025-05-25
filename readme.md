@@ -42,4 +42,4 @@ This is a random card generator created with JavaScript. It offers two modes: de
 ### 7. Simple visual countdown timer
 Visual countdown timer with full-screen flashing alert for silent environments. Set hours, minutes, and seconds for a visual notification.
 
-[<img src="https://img.shields.io/badge/DEMO-Try%20it%20out!-blue?style=for-the-badge&logo=github" alt="Demo Button" height="30"/>](https://tools.utkarshpatel.com/simple-countdown-timer.html)
+[<img src="https://img.shields.io/badge/DEMO-Try%20it%20out!-blue?style=for-the-badge&logo=github" alt="Demo Button" height="30"/>](https://tools.utkarshpatel.com/simple-visual-timer.html)
