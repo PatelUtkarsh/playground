@@ -1,0 +1,1483 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebRTC File Transfer - Direct Peer-to-Peer File Sharing</title>
+
+    <!-- SEO Meta Tags -->
+    <meta
+      name="description"
+      content="Direct peer-to-peer file transfer using WebRTC technology. Share files securely between browsers without server storage, featuring real-time progress tracking and drag-and-drop support."
+    />
+    <meta
+      name="keywords"
+      content="WebRTC, file transfer, peer-to-peer, P2P, file sharing, browser, direct transfer, secure sharing, real-time"
+    />
+    <meta name="author" content="WebRTC File Transfer Demo" />
+
+    <!-- Open Graph Tags -->
+    <meta
+      property="og:title"
+      content="WebRTC File Transfer - Direct Peer-to-Peer File Sharing"
+    />
+    <meta
+      property="og:description"
+      content="Direct peer-to-peer file transfer using WebRTC technology. Share files securely between browsers without server storage."
+    />
+    <meta property="og:type" content="website" />
+
+    <!-- Twitter Card Tags -->
+    <meta name="twitter:card" content="summary" />
+    <meta
+      name="twitter:title"
+      content="WebRTC File Transfer - Direct Peer-to-Peer File Sharing"
+    />
+    <meta
+      name="twitter:description"
+      content="Direct peer-to-peer file transfer using WebRTC technology. Share files securely between browsers without server storage."
+    />
+    <style>
+      :root {
+        /* Color Variables */
+        --md-sys-color-primary: #465d91;
+        --md-sys-color-on-primary: #ffffff;
+        --md-sys-color-primary-container: #d9e2ff;
+        --md-sys-color-on-primary-container: #001944;
+        --md-sys-color-secondary: #575e71;
+        --md-sys-color-on-secondary: #ffffff;
+        --md-sys-color-secondary-container: #dbe2f9;
+        --md-sys-color-on-secondary-container: #141b2c;
+        --md-sys-color-tertiary: #725572;
+        --md-sys-color-on-tertiary: #ffffff;
+        --md-sys-color-tertiary-container: #fdd7fb;
+        --md-sys-color-on-tertiary-container: #2a132c;
+        --md-sys-color-error: #ba1a1a;
+        --md-sys-color-on-error: #ffffff;
+        --md-sys-color-error-container: #ffdad6;
+        --md-sys-color-on-error-container: #410002;
+        --md-sys-color-background: #faf8ff;
+        --md-sys-color-on-background: #1a1b20;
+        --md-sys-color-surface: #faf8ff;
+        --md-sys-color-on-surface: #1a1b20;
+        --md-sys-color-surface-variant: #e1e2ec;
+        --md-sys-color-on-surface-variant: #44464f;
+        --md-sys-color-outline: #757780;
+        --md-sys-color-outline-variant: #c5c6d0;
+        --md-sys-color-surface-container: #eeedf4;
+        --md-sys-color-surface-container-high: #e8e7ef;
+        --md-sys-color-surface-container-highest: #e2e2e9;
+        --md-sys-color-surface-container-low: #f4f3fa;
+        --md-sys-color-surface-container-lowest: #ffffff;
+        --md-sys-color-surface-dim: #dad9e0;
+        --md-sys-color-surface-bright: #faf8ff;
+
+        /* Typography Scale */
+        --md-sys-typescale-display-large: 400 57px/64px "Google Sans", system-ui,
+          -apple-system, sans-serif;
+        --md-sys-typescale-display-medium: 400 45px/52px "Google Sans",
+          system-ui, -apple-system, sans-serif;
+        --md-sys-typescale-display-small: 400 36px/44px "Google Sans", system-ui,
+          -apple-system, sans-serif;
+        --md-sys-typescale-headline-large: 400 32px/40px "Google Sans",
+          system-ui, -apple-system, sans-serif;
+        --md-sys-typescale-headline-medium: 400 28px/36px "Google Sans",
+          system-ui, -apple-system, sans-serif;
+        --md-sys-typescale-headline-small: 400 24px/32px "Google Sans",
+          system-ui, -apple-system, sans-serif;
+        --md-sys-typescale-title-large: 400 22px/28px "Google Sans", system-ui,
+          -apple-system, sans-serif;
+        --md-sys-typescale-title-medium: 500 16px/24px "Google Sans", system-ui,
+          -apple-system, sans-serif;
+        --md-sys-typescale-title-small: 500 14px/20px "Google Sans", system-ui,
+          -apple-system, sans-serif;
+        --md-sys-typescale-body-large: 400 16px/24px "Google Sans", system-ui,
+          -apple-system, sans-serif;
+        --md-sys-typescale-body-medium: 400 14px/20px "Google Sans", system-ui,
+          -apple-system, sans-serif;
+        --md-sys-typescale-body-small: 400 12px/16px "Google Sans", system-ui,
+          -apple-system, sans-serif;
+        --md-sys-typescale-label-large: 500 14px/20px "Google Sans", system-ui,
+          -apple-system, sans-serif;
+        --md-sys-typescale-label-medium: 500 12px/16px "Google Sans", system-ui,
+          -apple-system, sans-serif;
+        --md-sys-typescale-label-small: 500 11px/16px "Google Sans", system-ui,
+          -apple-system, sans-serif;
+
+        /* Elevation */
+        --md-sys-elevation-level0: none;
+        --md-sys-elevation-level1: 0px 1px 2px 0px rgba(0, 0, 0, 0.3),
+          0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+        --md-sys-elevation-level2: 0px 1px 2px 0px rgba(0, 0, 0, 0.3),
+          0px 2px 6px 2px rgba(0, 0, 0, 0.15);
+        --md-sys-elevation-level3: 0px 1px 3px 0px rgba(0, 0, 0, 0.3),
+          0px 4px 8px 3px rgba(0, 0, 0, 0.15);
+        --md-sys-elevation-level4: 0px 2px 3px 0px rgba(0, 0, 0, 0.3),
+          0px 6px 10px 4px rgba(0, 0, 0, 0.15);
+        --md-sys-elevation-level5: 0px 4px 4px 0px rgba(0, 0, 0, 0.3),
+          0px 8px 12px 6px rgba(0, 0, 0, 0.15);
+
+        /* Motion */
+        --md-sys-motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+        --md-sys-motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
+        --md-sys-motion-duration-short: 250ms;
+        --md-sys-motion-duration-medium: 400ms;
+        --md-sys-motion-duration-long: 500ms;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --md-sys-color-primary: #afc6ff;
+          --md-sys-color-on-primary: #142f60;
+          --md-sys-color-primary-container: #2d4578;
+          --md-sys-color-on-primary-container: #d9e2ff;
+          --md-sys-color-secondary: #bfc6dc;
+          --md-sys-color-on-secondary: #293042;
+          --md-sys-color-secondary-container: #404659;
+          --md-sys-color-on-secondary-container: #dbe2f9;
+          --md-sys-color-tertiary: #dfbbde;
+          --md-sys-color-on-tertiary: #412742;
+          --md-sys-color-tertiary-container: #593e5a;
+          --md-sys-color-on-tertiary-container: #fdd7fb;
+          --md-sys-color-error: #ffb4ab;
+          --md-sys-color-on-error: #690005;
+          --md-sys-color-error-container: #93000a;
+          --md-sys-color-on-error-container: #ffdad6;
+          --md-sys-color-background: #121318;
+          --md-sys-color-on-background: #e2e2e9;
+          --md-sys-color-surface: #121318;
+          --md-sys-color-on-surface: #e2e2e9;
+          --md-sys-color-surface-variant: #44464f;
+          --md-sys-color-on-surface-variant: #c5c6d0;
+          --md-sys-color-outline: #8f9099;
+          --md-sys-color-outline-variant: #44464f;
+          --md-sys-color-surface-container: #1e1f25;
+          --md-sys-color-surface-container-high: #282a2f;
+          --md-sys-color-surface-container-highest: #33353a;
+          --md-sys-color-surface-container-low: #1a1b20;
+          --md-sys-color-surface-container-lowest: #0c0e13;
+          --md-sys-color-surface-dim: #121318;
+          --md-sys-color-surface-bright: #38393e;
+        }
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font: var(--md-sys-typescale-body-large);
+        background-color: var(--md-sys-color-background);
+        color: var(--md-sys-color-on-background);
+        min-height: 100vh;
+        transition: background-color var(--md-sys-motion-duration-medium)
+          var(--md-sys-motion-easing-standard);
+      }
+
+      .app-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        background-color: var(--md-sys-color-surface);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* Header Styles */
+      .app-header {
+        background-color: var(--md-sys-color-primary);
+        color: var(--md-sys-color-on-primary);
+        padding: 32px 24px;
+        text-align: center;
+      }
+
+      .app-title {
+        font: var(--md-sys-typescale-display-small);
+        margin-bottom: 8px;
+        font-weight: 400;
+      }
+
+      .app-subtitle {
+        font: var(--md-sys-typescale-title-medium);
+        opacity: 0.87;
+      }
+
+      /* Card Styles */
+      .instructions-card {
+        margin: 24px;
+        padding: 24px;
+        background-color: var(--md-sys-color-secondary-container);
+        color: var(--md-sys-color-on-secondary-container);
+        border-radius: 12px;
+        box-shadow: var(--md-sys-elevation-level1);
+      }
+
+      .instructions-title {
+        font: var(--md-sys-typescale-title-large);
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .instructions-list {
+        font: var(--md-sys-typescale-body-medium);
+        padding-left: 20px;
+      }
+
+      .instructions-list li {
+        margin-bottom: 8px;
+        line-height: 1.5;
+      }
+
+      /* Main Content Grid */
+      .content-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2px;
+        flex: 1;
+        background-color: var(--md-sys-color-outline-variant);
+      }
+
+      .peer-section {
+        background-color: var(--md-sys-color-surface-container-low);
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+
+      /* Peer Headers */
+      .peer-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--md-sys-color-outline-variant);
+      }
+
+      .peer-icon {
+        font-size: 32px;
+        background-color: var(--md-sys-color-primary-container);
+        color: var(--md-sys-color-on-primary-container);
+        width: 56px;
+        height: 56px;
+        border-radius: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .peer-title {
+        font: var(--md-sys-typescale-headline-small);
+      }
+
+      /* Step Cards */
+      .step-card {
+        background-color: var(--md-sys-color-surface-container);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: var(--md-sys-elevation-level1);
+        transition: box-shadow var(--md-sys-motion-duration-short)
+          var(--md-sys-motion-easing-standard);
+      }
+
+      .step-card:hover {
+        box-shadow: var(--md-sys-elevation-level2);
+      }
+
+      .step-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .step-number {
+        background-color: var(--md-sys-color-primary);
+        color: var(--md-sys-color-on-primary);
+        width: 28px;
+        height: 28px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font: var(--md-sys-typescale-label-medium);
+        font-weight: 600;
+      }
+
+      .step-title {
+        font: var(--md-sys-typescale-title-medium);
+      }
+
+      /* Button Styles */
+      .md-button {
+        background-color: var(--md-sys-color-primary);
+        color: var(--md-sys-color-on-primary);
+        border: none;
+        border-radius: 20px;
+        padding: 10px 24px;
+        font: var(--md-sys-typescale-label-large);
+        cursor: pointer;
+        transition: all var(--md-sys-motion-duration-short)
+          var(--md-sys-motion-easing-standard);
+        box-shadow: var(--md-sys-elevation-level1);
+        min-height: 40px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .md-button:hover:not(:disabled) {
+        box-shadow: var(--md-sys-elevation-level2);
+        background-color: color-mix(
+          in srgb,
+          var(--md-sys-color-primary) 92%,
+          var(--md-sys-color-on-primary) 8%
+        );
+      }
+
+      .md-button:active:not(:disabled) {
+        box-shadow: var(--md-sys-elevation-level1);
+      }
+
+      .md-button:disabled {
+        background-color: color-mix(
+          in srgb,
+          var(--md-sys-color-on-surface) 12%,
+          transparent
+        );
+        color: color-mix(
+          in srgb,
+          var(--md-sys-color-on-surface) 38%,
+          transparent
+        );
+        cursor: not-allowed;
+        box-shadow: none;
+      }
+
+      .md-button.secondary {
+        background-color: var(--md-sys-color-secondary);
+        color: var(--md-sys-color-on-secondary);
+      }
+
+      .md-button.tertiary {
+        background-color: var(--md-sys-color-tertiary);
+        color: var(--md-sys-color-on-tertiary);
+      }
+
+      .md-button.outlined {
+        background-color: transparent;
+        color: var(--md-sys-color-primary);
+        border: 1px solid var(--md-sys-color-outline);
+        box-shadow: none;
+      }
+
+      .md-button.outlined:hover:not(:disabled) {
+        background-color: color-mix(
+          in srgb,
+          var(--md-sys-color-primary) 8%,
+          transparent
+        );
+        box-shadow: var(--md-sys-elevation-level1);
+      }
+
+      /* Text Fields */
+      .md-text-field {
+        width: 100%;
+        background-color: var(--md-sys-color-surface-container-highest);
+        border: 1px solid var(--md-sys-color-outline);
+        border-radius: 4px;
+        padding: 16px;
+        font: var(--md-sys-typescale-body-large);
+        color: var(--md-sys-color-on-surface);
+        transition: all var(--md-sys-motion-duration-short)
+          var(--md-sys-motion-easing-standard);
+        resize: vertical;
+        min-height: 80px;
+      }
+
+      .md-text-field:focus {
+        outline: none;
+        border-color: var(--md-sys-color-primary);
+        border-width: 2px;
+        padding: 15px; /* Adjust for thicker border */
+      }
+
+      .md-text-field::placeholder {
+        color: var(--md-sys-color-on-surface-variant);
+      }
+
+      /* File Input */
+      .file-input-container {
+        position: relative;
+        width: 100%;
+      }
+
+      .file-input {
+        display: none;
+      }
+
+      .file-input-label {
+        display: block;
+        background-color: var(--md-sys-color-surface-container-highest);
+        border: 2px dashed var(--md-sys-color-outline);
+        border-radius: 8px;
+        padding: 24px;
+        text-align: center;
+        cursor: pointer;
+        transition: all var(--md-sys-motion-duration-short)
+          var(--md-sys-motion-easing-standard);
+        font: var(--md-sys-typescale-body-medium);
+        color: var(--md-sys-color-on-surface-variant);
+      }
+
+      .file-input-label:hover {
+        border-color: var(--md-sys-color-primary);
+        background-color: color-mix(
+          in srgb,
+          var(--md-sys-color-primary) 8%,
+          var(--md-sys-color-surface-container-highest)
+        );
+      }
+
+      .file-input-label.has-file {
+        border-color: var(--md-sys-color-primary);
+        background-color: var(--md-sys-color-primary-container);
+        color: var(--md-sys-color-on-primary-container);
+      }
+
+      /* Status Cards */
+      .status-card {
+        background-color: var(--md-sys-color-surface-container);
+        border-radius: 8px;
+        padding: 16px;
+        text-align: center;
+        font: var(--md-sys-typescale-body-medium);
+        font-weight: 500;
+        transition: all var(--md-sys-motion-duration-medium)
+          var(--md-sys-motion-easing-standard);
+      }
+
+      .status-card.waiting {
+        background-color: var(--md-sys-color-secondary-container);
+        color: var(--md-sys-color-on-secondary-container);
+      }
+
+      .status-card.connecting {
+        background-color: var(--md-sys-color-tertiary-container);
+        color: var(--md-sys-color-on-tertiary-container);
+      }
+
+      .status-card.connected {
+        background-color: color-mix(
+          in srgb,
+          #4caf50 20%,
+          var(--md-sys-color-surface-container)
+        );
+        color: #2e7d32;
+      }
+
+      .status-card.error {
+        background-color: var(--md-sys-color-error-container);
+        color: var(--md-sys-color-on-error-container);
+      }
+
+      .status-card.transferring {
+        background-color: var(--md-sys-color-primary-container);
+        color: var(--md-sys-color-on-primary-container);
+      }
+
+      /* Progress Indicators */
+      .progress-container {
+        margin: 16px 0;
+      }
+
+      .progress-track {
+        width: 100%;
+        height: 8px;
+        background-color: var(--md-sys-color-surface-container-highest);
+        border-radius: 4px;
+        overflow: hidden;
+      }
+
+      .progress-indicator {
+        height: 100%;
+        background-color: var(--md-sys-color-primary);
+        width: 0%;
+        transition: width var(--md-sys-motion-duration-medium)
+          var(--md-sys-motion-easing-emphasized);
+        border-radius: 4px;
+      }
+
+      .progress-text {
+        font: var(--md-sys-typescale-body-small);
+        color: var(--md-sys-color-on-surface-variant);
+        text-align: center;
+        margin-top: 8px;
+      }
+
+      /* Info Cards */
+      .info-card {
+        background-color: var(--md-sys-color-primary-container);
+        color: var(--md-sys-color-on-primary-container);
+        border-radius: 8px;
+        padding: 16px;
+        font: var(--md-sys-typescale-body-small);
+        line-height: 1.5;
+      }
+
+      /* Download Link */
+      .download-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background-color: var(--md-sys-color-tertiary);
+        color: var(--md-sys-color-on-tertiary);
+        padding: 12px 24px;
+        border-radius: 20px;
+        text-decoration: none;
+        font: var(--md-sys-typescale-label-large);
+        font-weight: 500;
+        transition: all var(--md-sys-motion-duration-short)
+          var(--md-sys-motion-easing-standard);
+        box-shadow: var(--md-sys-elevation-level1);
+      }
+
+      .download-link:hover {
+        box-shadow: var(--md-sys-elevation-level2);
+        background-color: color-mix(
+          in srgb,
+          var(--md-sys-color-tertiary) 92%,
+          var(--md-sys-color-on-tertiary) 8%
+        );
+      }
+
+      /* Log Container */
+      .log-container {
+        margin: 24px;
+        background-color: var(--md-sys-color-surface-container);
+        border-radius: 12px;
+        padding: 16px;
+        max-height: 200px;
+        overflow-y: auto;
+        box-shadow: var(--md-sys-elevation-level1);
+      }
+
+      .log-entry {
+        font: var(--md-sys-typescale-body-small);
+        font-family: "SF Mono", "Monaco", "Inconsolata", "Roboto Mono",
+          monospace;
+        padding: 4px 0;
+        border-bottom: 1px solid
+          color-mix(
+            in srgb,
+            var(--md-sys-color-outline-variant) 50%,
+            transparent
+          );
+      }
+
+      .log-entry:last-child {
+        border-bottom: none;
+      }
+
+      .log-entry.info {
+        color: var(--md-sys-color-primary);
+      }
+      .log-entry.success {
+        color: #4caf50;
+      }
+      .log-entry.error {
+        color: var(--md-sys-color-error);
+      }
+      .log-entry.warning {
+        color: #ff9800;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .content-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .app-header {
+          padding: 24px 16px;
+        }
+
+        .instructions-card,
+        .log-container {
+          margin: 16px;
+        }
+
+        .peer-section {
+          padding: 16px;
+        }
+      }
+
+      /* Animation for state changes */
+      @keyframes pulse {
+        0% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.7;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+
+      .status-card.connecting {
+        animation: pulse 2s infinite;
+      }
+
+      /* Hidden elements */
+      .hidden {
+        display: none !important;
+      }
+
+      /* Spacing utilities */
+      .mt-16 {
+        margin-top: 16px;
+      }
+      .mb-16 {
+        margin-bottom: 16px;
+      }
+      .gap-8 {
+        gap: 8px;
+      }
+      .gap-16 {
+        gap: 16px;
+      }
+
+      /* Button group */
+      .button-group {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-container">
+      <header class="app-header">
+        <h1 class="app-title">📁 WebRTC File Transfer</h1>
+        <p class="app-subtitle">
+          Direct peer-to-peer file sharing between browsers
+        </p>
+      </header>
+
+      <div class="instructions-card">
+        <h2 class="instructions-title">
+          <span>📋</span>
+          How to Use This Demo
+        </h2>
+        <ol class="instructions-list">
+          <li>
+            <strong>Sender:</strong> Click "Create Offer" and copy the generated
+            connection data
+          </li>
+          <li>
+            <strong>Receiver:</strong> Paste the offer and click "Create
+            Answer", then copy the response
+          </li>
+          <li>
+            <strong>Sender:</strong> Paste the answer and click "Connect" to
+            establish the connection
+          </li>
+          <li>
+            <strong>Sender:</strong> Select a file and click "Send File" to
+            begin transfer
+          </li>
+          <li>
+            <strong>Receiver:</strong> The file will be automatically downloaded
+            when transfer completes
+          </li>
+        </ol>
+      </div>
+
+      <div class="content-grid">
+        <!-- Sender Section -->
+        <div class="peer-section">
+          <div class="peer-header">
+            <div class="peer-icon">📤</div>
+            <div>
+              <h2 class="peer-title">Sender (Peer A)</h2>
+            </div>
+          </div>
+
+          <div class="step-card">
+            <div class="step-header">
+              <div class="step-number">1</div>
+              <h3 class="step-title">Create Connection Offer</h3>
+            </div>
+            <div class="button-group mb-16">
+              <button id="createOfferBtn" class="md-button">
+                Create Offer
+              </button>
+              <button id="copyOfferBtn" class="md-button outlined hidden">
+                Copy Offer
+              </button>
+            </div>
+            <textarea
+              id="offerTextarea"
+              class="md-text-field"
+              placeholder="Connection offer will appear here..."
+              readonly
+            ></textarea>
+          </div>
+
+          <div class="step-card">
+            <div class="step-header">
+              <div class="step-number">2</div>
+              <h3 class="step-title">Paste Answer from Receiver</h3>
+            </div>
+            <textarea
+              id="answerTextarea"
+              class="md-text-field mb-16"
+              placeholder="Paste the answer from receiver here..."
+            ></textarea>
+            <button id="setAnswerBtn" class="md-button" disabled>
+              Connect
+            </button>
+          </div>
+
+          <div id="senderStatus" class="status-card waiting">
+            Click "Create Offer" to start the connection process
+          </div>
+
+          <div class="step-card hidden" id="fileStep">
+            <div class="step-header">
+              <div class="step-number">3</div>
+              <h3 class="step-title">Send File</h3>
+            </div>
+            <div class="file-input-container mb-16">
+              <input type="file" id="fileInput" class="file-input" />
+              <label for="fileInput" class="file-input-label" id="fileLabel">
+                📁 Click to select a file or drag and drop here
+              </label>
+            </div>
+            <button id="sendFileBtn" class="md-button" disabled>
+              Send File
+            </button>
+            <div id="sendProgress" class="progress-container hidden">
+              <div class="progress-track">
+                <div class="progress-indicator" id="sendProgressFill"></div>
+              </div>
+              <div class="progress-text" id="sendProgressText">0%</div>
+            </div>
+            <div id="sendFileInfo" class="info-card hidden mt-16"></div>
+          </div>
+        </div>
+
+        <!-- Receiver Section -->
+        <div class="peer-section">
+          <div class="peer-header">
+            <div class="peer-icon">📥</div>
+            <div>
+              <h2 class="peer-title">Receiver (Peer B)</h2>
+            </div>
+          </div>
+
+          <div class="step-card">
+            <div class="step-header">
+              <div class="step-number">1</div>
+              <h3 class="step-title">Paste Offer from Sender</h3>
+            </div>
+            <textarea
+              id="offerInputTextarea"
+              class="md-text-field mb-16"
+              placeholder="Paste the offer from sender here..."
+            ></textarea>
+            <button id="setOfferBtn" class="md-button">Create Answer</button>
+          </div>
+
+          <div class="step-card">
+            <div class="step-header">
+              <div class="step-number">2</div>
+              <h3 class="step-title">Copy Answer to Sender</h3>
+            </div>
+            <textarea
+              id="answerOutputTextarea"
+              class="md-text-field mb-16"
+              placeholder="Answer will appear here..."
+              readonly
+            ></textarea>
+            <button id="copyAnswerBtn" class="md-button outlined hidden">
+              Copy Answer
+            </button>
+          </div>
+
+          <div id="receiverStatus" class="status-card waiting">
+            Waiting for connection offer from sender
+          </div>
+
+          <div class="step-card">
+            <div class="step-header">
+              <div class="step-number">3</div>
+              <h3 class="step-title">Receive File</h3>
+            </div>
+            <div id="receiveProgress" class="progress-container hidden">
+              <div class="progress-track">
+                <div class="progress-indicator" id="receiveProgressFill"></div>
+              </div>
+              <div class="progress-text" id="receiveProgressText">
+                Waiting for file transfer...
+              </div>
+            </div>
+            <div id="receiveFileInfo" class="info-card hidden mt-16"></div>
+            <div id="downloadSection" class="mt-16"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="log-container" id="logContainer">
+        <div class="log-entry info">
+          🚀 WebRTC File Transfer demo loaded and ready
+        </div>
+      </div>
+    </div>
+
+    <script>
+      class WebRTCFileTransfer {
+        constructor() {
+          this.senderConnection = null;
+          this.receiverConnection = null;
+          this.senderDataChannel = null;
+          this.receiverDataChannel = null;
+          this.fileChunks = [];
+          this.fileMetadata = null;
+          this.chunkSize = 16384; // 16KB chunks
+
+          this.initializeElements();
+          this.setupEventListeners();
+          this.log("✅ Demo initialized successfully", "success");
+        }
+
+        initializeElements() {
+          // Sender elements
+          this.createOfferBtn = document.getElementById("createOfferBtn");
+          this.offerTextarea = document.getElementById("offerTextarea");
+          this.copyOfferBtn = document.getElementById("copyOfferBtn");
+          this.answerTextarea = document.getElementById("answerTextarea");
+          this.setAnswerBtn = document.getElementById("setAnswerBtn");
+          this.senderStatus = document.getElementById("senderStatus");
+          this.fileInput = document.getElementById("fileInput");
+          this.fileLabel = document.getElementById("fileLabel");
+          this.sendFileBtn = document.getElementById("sendFileBtn");
+          this.fileStep = document.getElementById("fileStep");
+          this.sendProgress = document.getElementById("sendProgress");
+          this.sendProgressFill = document.getElementById("sendProgressFill");
+          this.sendProgressText = document.getElementById("sendProgressText");
+          this.sendFileInfo = document.getElementById("sendFileInfo");
+
+          // Receiver elements
+          this.offerInputTextarea =
+            document.getElementById("offerInputTextarea");
+          this.setOfferBtn = document.getElementById("setOfferBtn");
+          this.answerOutputTextarea = document.getElementById(
+            "answerOutputTextarea"
+          );
+          this.copyAnswerBtn = document.getElementById("copyAnswerBtn");
+          this.receiverStatus = document.getElementById("receiverStatus");
+          this.receiveProgress = document.getElementById("receiveProgress");
+          this.receiveProgressFill = document.getElementById(
+            "receiveProgressFill"
+          );
+          this.receiveProgressText = document.getElementById(
+            "receiveProgressText"
+          );
+          this.receiveFileInfo = document.getElementById("receiveFileInfo");
+          this.downloadSection = document.getElementById("downloadSection");
+
+          // Log container
+          this.logContainer = document.getElementById("logContainer");
+        }
+
+        setupEventListeners() {
+          // Sender events
+          this.createOfferBtn.addEventListener("click", () =>
+            this.createOffer()
+          );
+          this.copyOfferBtn.addEventListener("click", () =>
+            this.copyToClipboard(
+              this.offerTextarea.value,
+              "📋 Offer copied to clipboard!"
+            )
+          );
+          this.setAnswerBtn.addEventListener("click", () => this.setAnswer());
+          this.sendFileBtn.addEventListener("click", () => this.sendFile());
+          this.fileInput.addEventListener("change", (e) =>
+            this.handleFileSelect(e)
+          );
+
+          // Receiver events
+          this.setOfferBtn.addEventListener("click", () => this.setOffer());
+          this.copyAnswerBtn.addEventListener("click", () =>
+            this.copyToClipboard(
+              this.answerOutputTextarea.value,
+              "📋 Answer copied to clipboard!"
+            )
+          );
+
+          // Enable/disable buttons based on input
+          this.answerTextarea.addEventListener("input", () => {
+            this.setAnswerBtn.disabled = !this.answerTextarea.value.trim();
+          });
+
+          this.offerInputTextarea.addEventListener("input", () => {
+            this.setOfferBtn.disabled = !this.offerInputTextarea.value.trim();
+          });
+
+          // Drag and drop setup
+          this.setupDragAndDrop();
+        }
+
+        setupDragAndDrop() {
+          const label = this.fileLabel;
+
+          ["dragenter", "dragover", "dragleave", "drop"].forEach(
+            (eventName) => {
+              label.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              });
+            }
+          );
+
+          ["dragenter", "dragover"].forEach((eventName) => {
+            label.addEventListener(eventName, () => {
+              label.style.borderColor = "var(--md-sys-color-primary)";
+              label.style.backgroundColor =
+                "color-mix(in srgb, var(--md-sys-color-primary) 12%, var(--md-sys-color-surface-container-highest))";
+            });
+          });
+
+          ["dragleave", "drop"].forEach((eventName) => {
+            label.addEventListener(eventName, () => {
+              label.style.borderColor = "var(--md-sys-color-outline)";
+              label.style.backgroundColor =
+                "var(--md-sys-color-surface-container-highest)";
+            });
+          });
+
+          label.addEventListener("drop", (e) => {
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+              this.fileInput.files = files;
+              this.handleFileSelect({ target: { files } });
+            }
+          });
+        }
+
+        handleFileSelect(event) {
+          const file = event.target.files[0];
+          if (file) {
+            this.fileLabel.textContent = `📄 ${
+              file.name
+            } (${this.formatFileSize(file.size)})`;
+            this.fileLabel.classList.add("has-file");
+            this.sendFileBtn.disabled =
+              !this.senderDataChannel ||
+              this.senderDataChannel.readyState !== "open";
+            this.log(
+              `📁 File selected: ${file.name} (${this.formatFileSize(
+                file.size
+              )})`,
+              "info"
+            );
+          }
+        }
+
+        createPeerConnection(isSender = true) {
+          const config = {
+            iceServers: [
+              { urls: "stun:stun.l.google.com:19302" },
+              { urls: "stun:stun1.l.google.com:19302" },
+            ],
+          };
+
+          const connection = new RTCPeerConnection(config);
+
+          connection.onicecandidate = (event) => {
+            // ICE candidates are automatically included in the SDP
+          };
+
+          connection.onconnectionstatechange = () => {
+            const state = connection.connectionState;
+            this.log(
+              `🔗 Connection state changed: ${state}`,
+              state === "connected" ? "success" : "info"
+            );
+            this.updateConnectionStatus(state, isSender);
+          };
+
+          if (!isSender) {
+            connection.ondatachannel = (event) => {
+              this.receiverDataChannel = event.channel;
+              this.setupDataChannel(this.receiverDataChannel, false);
+            };
+          }
+
+          return connection;
+        }
+
+        setupDataChannel(channel, isSender = true) {
+          channel.onopen = () => {
+            this.log(
+              `📡 Data channel opened (${isSender ? "sender" : "receiver"})`,
+              "success"
+            );
+            if (isSender) {
+              this.sendFileBtn.disabled = !this.fileInput.files[0];
+              this.fileStep.classList.remove("hidden");
+            }
+          };
+
+          channel.onmessage = (event) => {
+            if (!isSender) {
+              this.handleIncomingData(event.data);
+            }
+          };
+
+          channel.onerror = (error) => {
+            this.log(`❌ Data channel error: ${error}`, "error");
+          };
+
+          channel.onclose = () => {
+            this.log(
+              `📡 Data channel closed (${isSender ? "sender" : "receiver"})`,
+              "warning"
+            );
+          };
+        }
+
+        async createOffer() {
+          try {
+            this.log("🔄 Creating connection offer...", "info");
+            this.updateStatus(
+              this.senderStatus,
+              "Creating connection offer...",
+              "connecting"
+            );
+
+            this.senderConnection = this.createPeerConnection(true);
+
+            // Create data channel for file transfer
+            this.senderDataChannel = this.senderConnection.createDataChannel(
+              "fileTransfer",
+              {
+                ordered: true,
+              }
+            );
+            this.setupDataChannel(this.senderDataChannel, true);
+
+            const offer = await this.senderConnection.createOffer();
+            await this.senderConnection.setLocalDescription(offer);
+
+            // Wait for ICE gathering to complete
+            await this.waitForICEGathering(this.senderConnection);
+
+            this.offerTextarea.value = JSON.stringify(
+              this.senderConnection.localDescription,
+              null,
+              2
+            );
+            this.copyOfferBtn.classList.remove("hidden");
+            this.setAnswerBtn.disabled = false;
+            this.updateStatus(
+              this.senderStatus,
+              "✅ Offer created! Copy and share with receiver.",
+              "waiting"
+            );
+            this.log("✅ Connection offer created successfully", "success");
+          } catch (error) {
+            this.log(`❌ Error creating offer: ${error.message}`, "error");
+            this.updateStatus(
+              this.senderStatus,
+              "❌ Error creating connection offer",
+              "error"
+            );
+          }
+        }
+
+        async setOffer() {
+          try {
+            const offerText = this.offerInputTextarea.value.trim();
+            if (!offerText) return;
+
+            this.log("🔄 Processing connection offer...", "info");
+            this.updateStatus(
+              this.receiverStatus,
+              "Processing connection offer...",
+              "connecting"
+            );
+
+            const offer = JSON.parse(offerText);
+            this.receiverConnection = this.createPeerConnection(false);
+
+            await this.receiverConnection.setRemoteDescription(offer);
+            const answer = await this.receiverConnection.createAnswer();
+            await this.receiverConnection.setLocalDescription(answer);
+
+            // Wait for ICE gathering to complete
+            await this.waitForICEGathering(this.receiverConnection);
+
+            this.answerOutputTextarea.value = JSON.stringify(
+              this.receiverConnection.localDescription,
+              null,
+              2
+            );
+            this.copyAnswerBtn.classList.remove("hidden");
+            this.updateStatus(
+              this.receiverStatus,
+              "✅ Answer created! Copy and share with sender.",
+              "waiting"
+            );
+            this.log("✅ Connection answer created successfully", "success");
+          } catch (error) {
+            this.log(`❌ Error processing offer: ${error.message}`, "error");
+            this.updateStatus(
+              this.receiverStatus,
+              "❌ Error processing connection offer",
+              "error"
+            );
+          }
+        }
+
+        async setAnswer() {
+          try {
+            const answerText = this.answerTextarea.value.trim();
+            if (!answerText) return;
+
+            this.log("🔄 Processing connection answer...", "info");
+            this.updateStatus(
+              this.senderStatus,
+              "Establishing connection...",
+              "connecting"
+            );
+
+            const answer = JSON.parse(answerText);
+            await this.senderConnection.setRemoteDescription(answer);
+            this.log(
+              "✅ Connection answer processed, establishing peer connection...",
+              "info"
+            );
+          } catch (error) {
+            this.log(`❌ Error processing answer: ${error.message}`, "error");
+            this.updateStatus(
+              this.senderStatus,
+              "❌ Error processing connection answer",
+              "error"
+            );
+          }
+        }
+
+        waitForICEGathering(connection) {
+          return new Promise((resolve) => {
+            if (connection.iceGatheringState === "complete") {
+              resolve();
+            } else {
+              const checkState = () => {
+                if (connection.iceGatheringState === "complete") {
+                  connection.removeEventListener(
+                    "icegatheringstatechange",
+                    checkState
+                  );
+                  resolve();
+                }
+              };
+              connection.addEventListener(
+                "icegatheringstatechange",
+                checkState
+              );
+
+              // Fallback timeout after 3 seconds
+              setTimeout(resolve, 3000);
+            }
+          });
+        }
+
+        async sendFile() {
+          const file = this.fileInput.files[0];
+          if (
+            !file ||
+            !this.senderDataChannel ||
+            this.senderDataChannel.readyState !== "open"
+          ) {
+            this.log(
+              "❌ Cannot send file: no file selected or connection not ready",
+              "error"
+            );
+            return;
+          }
+
+          try {
+            this.log(`🚀 Starting file transfer: ${file.name}`, "info");
+            this.updateStatus(
+              this.senderStatus,
+              "📤 Sending file...",
+              "transferring"
+            );
+            this.sendProgress.classList.remove("hidden");
+            this.sendFileInfo.classList.remove("hidden");
+            this.sendFileInfo.innerHTML = `
+                        <strong>📁 Sending:</strong> ${file.name}<br>
+                        <strong>📊 Size:</strong> ${this.formatFileSize(
+                          file.size
+                        )}<br>
+                        <strong>🏷️ Type:</strong> ${file.type || "Unknown"}
+                    `;
+
+            // Send file metadata first
+            const metadata = {
+              type: "metadata",
+              name: file.name,
+              size: file.size,
+              mimeType: file.type,
+              lastModified: file.lastModified,
+            };
+
+            this.senderDataChannel.send(JSON.stringify(metadata));
+            this.log("📋 File metadata sent", "info");
+
+            // Read file and send in chunks
+            const arrayBuffer = await file.arrayBuffer();
+            const totalChunks = Math.ceil(
+              arrayBuffer.byteLength / this.chunkSize
+            );
+
+            for (let i = 0; i < totalChunks; i++) {
+              const start = i * this.chunkSize;
+              const end = Math.min(
+                start + this.chunkSize,
+                arrayBuffer.byteLength
+              );
+              const chunk = arrayBuffer.slice(start, end);
+
+              const chunkMessage = {
+                type: "chunk",
+                index: i,
+                totalChunks: totalChunks,
+                data: Array.from(new Uint8Array(chunk)),
+              };
+
+              this.senderDataChannel.send(JSON.stringify(chunkMessage));
+
+              // Update progress indicator
+              const progress = Math.round(((i + 1) / totalChunks) * 100);
+              this.sendProgressFill.style.width = `${progress}%`;
+              this.sendProgressText.textContent = `${progress}% (${
+                i + 1
+              }/${totalChunks} chunks sent)`;
+
+              // Small delay to prevent overwhelming the connection
+              if (i % 10 === 0) {
+                await new Promise((resolve) => setTimeout(resolve, 1));
+              }
+            }
+
+            // Send completion signal
+            this.senderDataChannel.send(JSON.stringify({ type: "complete" }));
+            this.log("✅ File transfer completed successfully", "success");
+            this.sendProgressText.textContent =
+              "✅ Transfer completed successfully!";
+            this.updateStatus(
+              this.senderStatus,
+              "✅ File sent successfully!",
+              "connected"
+            );
+          } catch (error) {
+            this.log(`❌ Error sending file: ${error.message}`, "error");
+            this.updateStatus(
+              this.senderStatus,
+              "❌ Error sending file",
+              "error"
+            );
+          }
+        }
+
+        handleIncomingData(data) {
+          try {
+            const message = JSON.parse(data);
+
+            switch (message.type) {
+              case "metadata":
+                this.fileMetadata = message;
+                this.fileChunks = new Array(
+                  Math.ceil(message.size / this.chunkSize)
+                );
+                this.receiveProgress.classList.remove("hidden");
+                this.receiveFileInfo.classList.remove("hidden");
+                this.receiveFileInfo.innerHTML = `
+                                <strong>📁 Receiving:</strong> ${
+                                  message.name
+                                }<br>
+                                <strong>📊 Size:</strong> ${this.formatFileSize(
+                                  message.size
+                                )}<br>
+                                <strong>🏷️ Type:</strong> ${
+                                  message.mimeType || "Unknown"
+                                }
+                            `;
+                this.log(`📥 Receiving file: ${message.name}`, "info");
+                this.updateStatus(
+                  this.receiverStatus,
+                  "📥 Receiving file...",
+                  "transferring"
+                );
+                break;
+
+              case "chunk":
+                this.fileChunks[message.index] = new Uint8Array(message.data);
+                const receivedChunks = this.fileChunks.filter(
+                  (chunk) => chunk !== undefined
+                ).length;
+                const progress = Math.round(
+                  (receivedChunks / message.totalChunks) * 100
+                );
+                this.receiveProgressFill.style.width = `${progress}%`;
+                this.receiveProgressText.textContent = `${progress}% (${receivedChunks}/${message.totalChunks} chunks received)`;
+                break;
+
+              case "complete":
+                this.assembleAndDownloadFile();
+                break;
+            }
+          } catch (error) {
+            this.log(
+              `❌ Error handling incoming data: ${error.message}`,
+              "error"
+            );
+          }
+        }
+
+        assembleAndDownloadFile() {
+          try {
+            this.log("🔧 Assembling received file...", "info");
+
+            // Calculate total size and create combined array
+            const totalSize = this.fileChunks.reduce(
+              (sum, chunk) => sum + (chunk ? chunk.length : 0),
+              0
+            );
+            const combinedArray = new Uint8Array(totalSize);
+
+            let offset = 0;
+            for (const chunk of this.fileChunks) {
+              if (chunk) {
+                combinedArray.set(chunk, offset);
+                offset += chunk.length;
+              }
+            }
+
+            // Create blob and download link
+            const blob = new Blob([combinedArray], {
+              type: this.fileMetadata.mimeType,
+            });
+            const url = URL.createObjectURL(blob);
+
+            const downloadLink = document.createElement("a");
+            downloadLink.href = url;
+            downloadLink.download = this.fileMetadata.name;
+            downloadLink.className = "download-link";
+            downloadLink.innerHTML = `
+                        <span>📁</span>
+                        <span>Download ${this.fileMetadata.name}</span>
+                    `;
+
+            this.downloadSection.innerHTML = "";
+            this.downloadSection.appendChild(downloadLink);
+
+            this.receiveProgressText.textContent =
+              "✅ File received! Click below to download.";
+            this.updateStatus(
+              this.receiverStatus,
+              "✅ File received successfully!",
+              "connected"
+            );
+            this.log("✅ File assembled and ready for download", "success");
+
+            // Auto-download the file
+            downloadLink.click();
+          } catch (error) {
+            this.log(`❌ Error assembling file: ${error.message}`, "error");
+            this.updateStatus(
+              this.receiverStatus,
+              "❌ Error receiving file",
+              "error"
+            );
+          }
+        }
+
+        updateConnectionStatus(state, isSender) {
+          const statusElement = isSender
+            ? this.senderStatus
+            : this.receiverStatus;
+          const statusMap = {
+            connecting: {
+              text: "🔗 Connecting to peer...",
+              class: "connecting",
+            },
+            connected: {
+              text: "✅ Connected! Ready for file transfer.",
+              class: "connected",
+            },
+            disconnected: { text: "❌ Connection lost", class: "error" },
+            failed: { text: "❌ Connection failed", class: "error" },
+            closed: { text: "🔌 Connection closed", class: "waiting" },
+          };
+
+          const status = statusMap[state] || { text: state, class: "waiting" };
+          this.updateStatus(statusElement, status.text, status.class);
+        }
+
+        updateStatus(element, text, className) {
+          element.textContent = text;
+          element.className = `status-card ${className}`;
+        }
+
+        async copyToClipboard(text, successMessage) {
+          try {
+            await navigator.clipboard.writeText(text);
+            this.log(successMessage, "success");
+          } catch (error) {
+            // Fallback for older browsers
+            const textarea = document.createElement("textarea");
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand("copy");
+            document.body.removeChild(textarea);
+            this.log(successMessage, "success");
+          }
+        }
+
+        formatFileSize(bytes) {
+          if (bytes === 0) return "0 Bytes";
+          const k = 1024;
+          const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+          const i = Math.floor(Math.log(bytes) / Math.log(k));
+          return (
+            parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i]
+          );
+        }
+
+        log(message, type = "info") {
+          const timestamp = new Date().toLocaleTimeString();
+          const logEntry = document.createElement("div");
+          logEntry.className = `log-entry ${type}`;
+          logEntry.textContent = `[${timestamp}] ${message}`;
+          this.logContainer.appendChild(logEntry);
+          this.logContainer.scrollTop = this.logContainer.scrollHeight;
+        }
+      }
+
+      // Initialize the demo when page loads
+      document.addEventListener("DOMContentLoaded", () => {
+        new WebRTCFileTransfer();
+      });
+    </script>
+  </body>
+</html>

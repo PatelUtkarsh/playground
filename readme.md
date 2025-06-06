@@ -38,8 +38,13 @@ This is a random card generator created with JavaScript. It offers two modes: de
 
 [<img src="https://img.shields.io/badge/DEMO-Try%20it%20out!-blue?style=for-the-badge&logo=github" alt="Demo Button" height="30"/>](https://tools.utkarshpatel.com/random-card.html)
 
-
 ### 7. Simple visual countdown timer
 Visual countdown timer with full-screen flashing alert for silent environments. Set hours, minutes, and seconds for a visual notification.
 
 [<img src="https://img.shields.io/badge/DEMO-Try%20it%20out!-blue?style=for-the-badge&logo=github" alt="Demo Button" height="30"/>](https://tools.utkarshpatel.com/simple-visual-timer.html)
+
+### 8. WebRTC File Transfer Demo
+
+A demo of peer-to-peer file sharing application using WebRTC. Transfer files directly between browsers without any server storage, featuring real-time progress tracking.
+
+[<img src="https://img.shields.io/badge/DEMO-Try%20it%20out!-blue?style=for-the-badge&logo=github" alt="Demo Button" height="30"/>](https://tools.utkarshpatel.com/webrtc.html)
