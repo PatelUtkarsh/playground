@@ -48,3 +48,10 @@ Visual countdown timer with full-screen flashing alert for silent environments. 
 A demo of peer-to-peer file sharing application using WebRTC. Transfer files directly between browsers without any server storage, featuring real-time progress tracking.
 
 [<img src="https://img.shields.io/badge/DEMO-Try%20it%20out!-blue?style=for-the-badge&logo=github" alt="Demo Button" height="30"/>](https://tools.utkarshpatel.com/webrtc.html)
+
+
+### 9. Fluid typography demo using Clamp.
+
+A demo of fluid typography using CSS `clamp()` function. It allows you to create responsive text that scales smoothly across different screen sizes.
+
+[<img src="https://img.shields.io/badge/DEMO-Try%20it%20out!-blue?style=for-the-badge&logo=github" alt="Demo Button" height="30"/>](https://tools.utkarshpatel.com/fluid-typography.html)
