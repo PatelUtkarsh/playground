@@ -4,37 +4,60 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>
-      CSS Clamp Fluid Typography Demo - Interactive Typography Scaling Tool
+      CSS Clamp() Function Demo - Interactive Fluid Typography Generator
     </title>
 
     <!-- SEO Meta Tags -->
     <meta
       name="description"
-      content="Interactive CSS clamp() fluid typography demo. Test responsive font scaling with customizable screen sizes and font ranges."
+      content="Interactive CSS clamp() function demo for fluid typography. Learn and test responsive font scaling with min, max, and preferred values. Generate CSS clamp code instantly."
     />
     <meta
       name="keywords"
-      content="CSS clamp, fluid typography, responsive design,font scaling, web typography, CSS fluid typography demo"
+      content="CSS clamp function, fluid typography, CSS clamp generator, responsive typography, CSS clamp calculator, viewport units, CSS font scaling, clamp min max preferred"
     />
-    <meta name="author" content="CSS Typography Demo" />
+    <meta name="author" content="CSS Clamp Typography Tool" />
     <meta name="robots" content="index, follow" />
 
     <!-- Open Graph Tags -->
-    <meta property="og:title" content="CSS Clamp Fluid Typography Demo" />
+    <meta
+      property="og:title"
+      content="CSS Clamp() Function Demo - Interactive Fluid Typography Generator"
+    />
     <meta
       property="og:description"
-      content="Interactive tool for testing CSS clamp() fluid typography"
+      content="Master CSS clamp() with this interactive demo. Test fluid typography, generate clamp code, and see responsive font scaling in real-time."
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="" />
 
     <!-- Twitter Card Tags -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="CSS Clamp Fluid Typography Demo" />
+    <meta
+      name="twitter:title"
+      content="CSS Clamp() Function Demo - Interactive Fluid Typography Generator"
+    />
     <meta
       name="twitter:description"
-      content="Interactive CSS clamp() fluid typography demo"
+      content="Interactive CSS clamp() demo for fluid typography. Test responsive font scaling and generate clamp code."
     />
+
+    <!-- Schema.org structured data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "CSS Clamp Function Demo",
+        "description": "Interactive tool for learning and testing CSS clamp() function for fluid typography",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Any",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        }
+      }
+    </script>
 
     <style>
       :root {
@@ -68,7 +91,8 @@
         --font-size-max: 32;
         --viewport-min: 320;
         --viewport-max: 1200;
-        --current-viewport: 100vw;
+        --current-viewport: 1200;
+        --calculated-font-size: 16;
       }
 
       @media (prefers-color-scheme: dark) {
@@ -234,59 +258,29 @@
       }
 
       .demo-text {
-        font-size: clamp(
-          calc(var(--font-size-min) * 1px),
-          calc(
-            var(--font-size-min) * 1px +
-              (var(--font-size-max) - var(--font-size-min)) *
-              (
-                (100vw - var(--viewport-min) * 1px) /
-                  (var(--viewport-max) - var(--viewport-min))
-              )
-          ),
-          calc(var(--font-size-max) * 1px)
-        );
+        font-size: calc(var(--calculated-font-size) * 1px);
         margin-bottom: 1rem;
         font-weight: 400;
         line-height: 1.4;
+        transition: font-size 0.3s ease;
       }
 
       .demo-heading {
-        font-size: clamp(
-          calc((var(--font-size-min) + 8) * 1px),
-          calc(
-            (var(--font-size-min) + 8) * 1px +
-              (var(--font-size-max) + 16 - var(--font-size-min) - 8) *
-              (
-                (100vw - var(--viewport-min) * 1px) /
-                  (var(--viewport-max) - var(--viewport-min))
-              )
-          ),
-          calc((var(--font-size-max) + 16) * 1px)
-        );
+        font-size: calc((var(--calculated-font-size) + 8) * 1px);
         font-weight: 700;
         color: var(--md-primary);
         margin-bottom: 1rem;
         line-height: 1.2;
+        transition: font-size 0.3s ease;
       }
 
       .demo-subheading {
-        font-size: clamp(
-          calc((var(--font-size-min) + 4) * 1px),
-          calc(
-            (var(--font-size-min) + 4) * 1px +
-              (var(--font-size-max) + 8 - var(--font-size-min) - 4) *
-              (
-                (100vw - var(--viewport-min) * 1px) /
-                  (var(--viewport-max) - var(--viewport-min))
-              )
-          ),
-          calc((var(--font-size-max) + 8) * 1px)
-        );
+        font-size: calc((var(--calculated-font-size) + 4) * 1px);
         font-weight: 600;
         color: var(--md-secondary);
         margin-bottom: 0.75rem;
         line-height: 1.3;
+        transition: font-size 0.3s ease;
       }
 
       .css-output {
@@ -344,20 +338,34 @@
         z-index: 1000;
         font-family: "Courier New", monospace;
       }
+
+      .current-font-size {
+        background: var(--md-tertiary-container);
+        color: var(--md-on-tertiary-container);
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-family: "Courier New", monospace;
+        font-weight: 600;
+        margin-top: 0.5rem;
+        display: inline-block;
+      }
     </style>
   </head>
   <body>
     <div class="viewport-indicator" id="viewportIndicator">
-      Viewport: <span id="currentViewport">100vw</span>
+      Viewport: <span id="currentViewport">1200px</span>
     </div>
 
     <div class="demo-container" id="demoContainer">
       <header>
-        <h1 class="demo-heading">CSS Clamp Fluid Typography Demo</h1>
+        <h1 class="demo-heading">CSS Clamp() Function Demo</h1>
         <p class="demo-text">
-          Interactive tool for testing responsive typography with CSS clamp()
-          function
+          Interactive tool for testing CSS clamp() fluid typography with
+          real-time preview
         </p>
+        <div class="current-font-size" id="currentFontSize">
+          Current font size: 32px
+        </div>
       </header>
 
       <section class="controls-panel">
@@ -503,50 +511,50 @@
       </section>
 
       <main class="typography-demo">
-        <h1 class="demo-heading">Responsive Typography Showcase</h1>
+        <h1 class="demo-heading">CSS Clamp() Function Tutorial</h1>
 
-        <h2 class="demo-subheading">Responsive typography interactive demo</h2>
+        <h2 class="demo-subheading">Understanding CSS Clamp Syntax</h2>
 
         <p class="demo-text">
-          This demonstration showcases fluid typography using CSS clamp()
-          function with a beautiful color scheme. The text scales smoothly
-          between your defined minimum and maximum font sizes based on the
-          viewport width.
+          The CSS clamp() function constrains a value between minimum and
+          maximum limits. It takes three parameters: clamp(minimum, preferred,
+          maximum). The preferred value is typically based on viewport units to
+          create fluid scaling between the defined boundaries.
         </p>
 
-        <h2 class="demo-subheading">Benefits of Fluid Typography</h2>
+        <h2 class="demo-subheading">Fluid Typography Benefits</h2>
 
         <p class="demo-text">
-          Fluid typography provides a seamless reading experience across all
-          device sizes. Instead of abrupt font size changes at breakpoints,
-          clamp() creates smooth transitions that adapt to any screen size. This
-          approach reduces the need for multiple media queries while maintaining
-          optimal readability and visual hierarchy.
+          CSS clamp() eliminates the need for multiple media queries by
+          providing smooth, continuous scaling. This creates better user
+          experiences across all device sizes while maintaining readable text at
+          every viewport width. The function automatically handles edge cases
+          and prevents text from becoming too small or too large.
         </p>
 
-        <h2 class="demo-subheading">CSS Clamp Function Explained</h2>
+        <h2 class="demo-subheading">Implementation Example</h2>
 
         <p class="demo-text">
-          The clamp() function takes three parameters: minimum value, preferred
-          value, and maximum value. The preferred value typically uses viewport
-          units (vw) to create the fluid scaling effect. Our implementation uses
-          a calculated approach that scales proportionally between defined
-          viewport ranges.
+          Watch how the font size changes as you adjust the screen size slider
+          above. The text scales proportionally between your defined minimum and
+          maximum values, demonstrating the power of CSS clamp() for responsive
+          typography design.
         </p>
 
         <div class="css-output" id="cssOutput">
-          <strong>Current CSS:</strong><br />
+          <strong>Generated CSS clamp() code:</strong><br />
           font-size: clamp(16px, 16px + 16 * ((100vw - 320px) / 880), 32px);
         </div>
       </main>
 
       <aside class="info-panel">
-        <h3 class="info-title">About This Demo</h3>
+        <h3 class="info-title">CSS Clamp() Function Demo</h3>
         <p>
-          This interactive demo allows you to experiment with CSS clamp() fluid
-          typography in real-time. Adjust the controls above to see how
-          different settings affect text scaling. The color scheme automatically
-          adapts to your system's dark/light mode preference.
+          This interactive demonstration shows how CSS clamp() creates fluid
+          typography. Experiment with different viewport sizes and font ranges
+          to understand how the clamp function calculates intermediate values.
+          The color scheme adapts to your system's dark/light mode preference
+          for optimal viewing.
         </p>
       </aside>
     </div>
@@ -568,6 +576,29 @@
       const demoContainer = document.getElementById("demoContainer");
       const cssOutput = document.getElementById("cssOutput");
       const viewportIndicator = document.getElementById("currentViewport");
+      const currentFontSize = document.getElementById("currentFontSize");
+
+      // Calculate font size based on clamp logic
+      function calculateFontSize(
+        currentViewport,
+        minFont,
+        maxFont,
+        minViewport,
+        maxViewport
+      ) {
+        if (currentViewport <= minViewport) {
+          return minFont;
+        }
+        if (currentViewport >= maxViewport) {
+          return maxFont;
+        }
+
+        const viewportRange = maxViewport - minViewport;
+        const fontRange = maxFont - minFont;
+        const progress = (currentViewport - minViewport) / viewportRange;
+
+        return Math.round(minFont + fontRange * progress);
+      }
 
       // Update CSS custom properties and displays
       function updateTypography() {
@@ -576,6 +607,15 @@
         const minViewport = parseInt(minViewportSlider.value);
         const maxViewport = parseInt(maxViewportSlider.value);
         const screenSize = parseInt(screenSizeSlider.value);
+
+        // Calculate current font size based on simulated viewport
+        const calculatedFontSize = calculateFontSize(
+          screenSize,
+          minFont,
+          maxFont,
+          minViewport,
+          maxViewport
+        );
 
         // Update CSS variables
         document.documentElement.style.setProperty("--font-size-min", minFont);
@@ -592,6 +632,10 @@
           "--current-viewport",
           `${screenSize}px`
         );
+        document.documentElement.style.setProperty(
+          "--calculated-font-size",
+          calculatedFontSize
+        );
 
         // Update display values
         minFontValue.textContent = `${minFont}px`;
@@ -600,13 +644,14 @@
         maxViewportValue.textContent = `${maxViewport}px`;
         screenValue.textContent = `${screenSize}px`;
         viewportIndicator.textContent = `${screenSize}px`;
+        currentFontSize.textContent = `Current font size: ${calculatedFontSize}px`;
 
         // Calculate and display current CSS
         const viewportDiff = maxViewport - minViewport;
         const fontDiff = maxFont - minFont;
 
         const cssText = `font-size: clamp(${minFont}px, ${minFont}px + ${fontDiff} * ((100vw - ${minViewport}px) / ${viewportDiff}), ${maxFont}px);`;
-        cssOutput.innerHTML = `<strong>Current CSS:</strong><br>${cssText}`;
+        cssOutput.innerHTML = `<strong>Generated CSS clamp() code:</strong><br>${cssText}`;
       }
 
       // Preset functions
